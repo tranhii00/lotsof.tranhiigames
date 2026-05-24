@@ -1,0 +1,57 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 20% 30%, rgba(96,165,250,0.05), transparent 60%),
+              radial-gradient(ellipse at 80% 70%, rgba(248,113,113,0.05), transparent 60%);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 44px 36px;
+  width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 0 60px rgba(0,0,0,0.5);
+}
+
+.logo { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.logoX { font-size: 32px; color: var(--x); text-shadow: 0 0 20px var(--x-glow); }
+.logoO { font-size: 32px; color: var(--o); text-shadow: 0 0 20px var(--o-glow); }
+.logoTitle { font-size: 26px; font-weight: 800; color: var(--text); }
+
+.sub { text-align: center; color: var(--dim); font-size: 13px; margin-top: -10px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 12px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+
+.tabs { display: flex; gap: 8px; }
+.tab, .tabActive {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+}
+.tab { background: var(--surface2); color: var(--dim); }
+.tabActive { background: var(--green); color: #fff; border-color: var(--green); }
+
+.section { display: flex; flex-direction: column; gap: 12px; }
+.hint { font-size: 13px; color: var(--dim); line-height: 1.5; }
+
+.btnPrimary {
+  padding: 13px;
+  background: var(--green);
+  color: #fff;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  width: 100%;
+}
+
+.error { color: var(--red); font-size: 13px; font-weight: 600; }

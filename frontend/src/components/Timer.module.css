@@ -1,0 +1,18 @@
+.box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.label { font-size: 11px; color: var(--dim); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.display { font-size: 42px; font-weight: 800; color: var(--green); line-height: 1; }
+.display.danger { color: var(--red); animation: shake 0.3s ease-in-out; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 33%{transform:translateX(-4px)} 66%{transform:translateX(4px)} }
+
+.barBg { background: var(--surface2); border-radius: 4px; height: 6px; overflow: hidden; }
+.bar { height: 100%; background: var(--green); border-radius: 4px; transition: width 0.5s linear, background 0.3s; }
+.barDanger { background: var(--red); }

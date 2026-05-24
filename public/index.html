@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cờ Caro Trực Tuyến | Multiplayer Real-time</title>
+    <meta name="description" content="Chơi cờ caro trực tuyến cùng bạn bè trên 2 máy khác nhau, thời gian thực.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===== MENU SCREEN ===== -->
+<div id="screen-menu" class="screen active">
+    <div class="menu-card">
+        <div class="logo">
+            <span class="logo-x">✕</span>
+            <span class="logo-title">Cờ Caro</span>
+            <span class="logo-o">○</span>
+        </div>
+        <p class="subtitle">Trận đấu trực tuyến - Thời gian thực</p>
+
+        <div class="form-group">
+            <label for="player-name-input">Tên của bạn</label>
+            <input type="text" id="player-name-input" placeholder="Nhập tên..." maxlength="20" value="Người chơi">
+        </div>
+
+        <button id="btn-find-match" class="btn btn-primary btn-lg">
+            <span class="btn-icon">⚔️</span> Tìm trận đấu
+        </button>
+
+        <div class="info-box">
+            <p>🌐 Cùng mạng WiFi: Chia sẻ địa chỉ IP</p>
+            <p>📡 Khác mạng: Dùng lệnh <code>node tunnel.js</code></p>
+        </div>
+    </div>
+</div>
+
+<!-- ===== WAITING SCREEN ===== -->
+<div id="screen-waiting" class="screen">
+    <div class="waiting-card">
+        <div class="pulse-ring"></div>
+        <h2>Đang tìm đối thủ...</h2>
+        <p class="waiting-name" id="waiting-player-name"></p>
+        <p class="waiting-hint">Chia sẻ link này cho bạn bè và yêu cầu họ vào tìm trận!</p>
+        <div class="link-share-box">
+            <span id="share-link-text">http://localhost:3001</span>
+            <button id="btn-copy-link" class="btn btn-small">Sao chép</button>
+        </div>
+        <button id="btn-cancel-match" class="btn btn-danger">Huỷ</button>
+    </div>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="screen-game" class="screen">
+    <div class="game-layout">
+
+        <!-- LEFT PANEL: Info + Chat -->
+        <div class="side-panel left-panel">
+            <div class="player-card" id="card-player-x">
+                <div class="player-symbol x">✕</div>
+                <div class="player-details">
+                    <span class="player-label">Người chơi X</span>
+                    <span class="player-name" id="name-x">---</span>
+                </div>
+                <div class="active-indicator" id="indicator-x"></div>
+            </div>
+
+            <div class="timer-box">
+                <div class="timer-label">⏱ Còn lại</div>
+                <div class="timer-display" id="timer-display">30</div>
+                <div class="timer-bar-bg">
+                    <div class="timer-bar" id="timer-bar"></div>
+                </div>
+            </div>
+
+            <div class="player-card" id="card-player-o">
+                <div class="player-symbol o">○</div>
+                <div class="player-details">
+                    <span class="player-label">Người chơi O</span>
+                    <span class="player-name" id="name-o">---</span>
+                </div>
+                <div class="active-indicator" id="indicator-o"></div>
+            </div>
+
+            <div class="my-role-tag">
+                Bạn là: <strong id="my-role-display">---</strong>
+            </div>
+        </div>
+
+        <!-- CENTER: Board -->
+        <div class="board-wrapper">
+            <div class="board-status" id="board-status">Chờ đối thủ đánh...</div>
+            <div id="board" class="board"></div>
+        </div>
+
+        <!-- RIGHT PANEL: Chat -->
+        <div class="side-panel right-panel">
+            <div class="chat-header">💬 Chat trong trận</div>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-row">
+                <input type="text" id="chat-input" placeholder="Nhắn tin..." maxlength="200">
+                <button id="btn-send-chat" class="btn btn-small">Gửi</button>
+            </div>
+            <button id="btn-leave" class="btn btn-danger btn-full">🚪 Thoát phòng</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ===== MODAL ===== -->
+<div id="modal-overlay" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-emoji" id="modal-emoji">🏆</div>
+        <h2 id="modal-title">Thông báo</h2>
+        <p id="modal-msg"></p>
+        <div class="modal-actions">
+            <button id="btn-modal-close" class="btn btn-primary">Quay lại Menu</button>
+        </div>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="client.js"></script>
+</body>
+</html>

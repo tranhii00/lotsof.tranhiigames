@@ -1,0 +1,89 @@
+.layout {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+}
+
+.left, .right {
+  width: 210px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.playerCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s;
+}
+.playerCard.active {
+  border-color: var(--green);
+  box-shadow: 0 0 16px rgba(16,185,129,0.2);
+}
+
+.symbolX { font-size: 28px; color: var(--x); }
+.symbolO { font-size: 28px; color: var(--o); }
+
+.playerLabel { font-size: 10px; color: var(--dim); font-weight: 700; text-transform: uppercase; }
+.playerName { font-size: 13px; font-weight: 700; }
+
+.myTag {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px;
+  font-size: 13px;
+  color: var(--dim);
+  text-align: center;
+}
+.tagX { color: var(--x); font-size: 16px; }
+.tagO { color: var(--o); font-size: 16px; }
+
+.leaveBtn {
+  background: var(--red);
+  color: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  width: 100%;
+  margin-top: auto;
+}
+
+.status {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dim);
+  text-align: center;
+  min-width: 260px;
+}
+.statusYou {
+  color: var(--green);
+  border-color: var(--green);
+  background: rgba(16,185,129,0.08);
+}
+
+@media (max-width: 1000px) {
+  .layout { flex-direction: column; }
+  .left, .right { width: 100%; max-width: 520px; flex-direction: row; flex-wrap: wrap; }
+}
