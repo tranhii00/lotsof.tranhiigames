@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Board from './Board';
 import Timer from './Timer';
 import ChatPanel from './ChatPanel';
@@ -5,55 +6,63 @@ import styles from './GameScreen.module.css';
 
 export default function GameScreen({
   myRole, myName, opponentName,
-  board, currentTurn, timerInfo,
-  chatMsgs, onMove, onChat, onLeave
+  board, currentTurn, timerInfo, turnDuration,
+  chatMsgs, lastMove, winningLine,
+  onMove, onChat, onLeave,
 }) {
+  const [chatOpen, setChatOpen] = useState(true);
   const xName = myRole === 'X' ? myName : opponentName;
   const oName = myRole === 'O' ? myName : opponentName;
   const isMyTurn = currentTurn === myRole;
+  const gameOver = Boolean(winningLine);
 
   return (
     <div className={styles.layout}>
-      {/* LEFT */}
-      <div className={styles.left}>
-        <div className={`${styles.playerCard} ${currentTurn === 'X' ? styles.active : ''}`}>
-          <span className={styles.symbolX}>✕</span>
-          <div>
-            <div className={styles.playerLabel}>Người chơi X</div>
-            <div className={styles.playerName}>{xName}{myRole==='X'?' (bạn)':''}</div>
+
+      {/* ── TOP BAR (status + timer + player info) ── */}
+      <div className={styles.topBar}>
+        <div className={`${styles.playerChip} ${currentTurn === 'X' ? styles.activeX : ''}`}>
+          <span className={styles.symX}>✕</span>
+          <span>{xName}{myRole === 'X' ? ' (bạn)' : ''}</span>
+        </div>
+
+        <div className={styles.center}>
+          <div className={`${styles.statusBadge} ${isMyTurn ? styles.yourTurn : ''}`}>
+            {isMyTurn ? '⚡ Lượt của bạn!' : `⏳ ${currentTurn === 'X' ? xName : oName}...`}
           </div>
+          <Timer timerInfo={timerInfo} turnDuration={turnDuration} />
         </div>
 
-        <Timer timerInfo={timerInfo} duration={30} />
-
-        <div className={`${styles.playerCard} ${currentTurn === 'O' ? styles.active : ''}`}>
-          <span className={styles.symbolO}>○</span>
-          <div>
-            <div className={styles.playerLabel}>Người chơi O</div>
-            <div className={styles.playerName}>{oName}{myRole==='O'?' (bạn)':''}</div>
-          </div>
+        <div className={`${styles.playerChip} ${currentTurn === 'O' ? styles.activeO : ''}`}>
+          <span>{oName}{myRole === 'O' ? ' (bạn)' : ''}</span>
+          <span className={styles.symO}>○</span>
         </div>
-
-        <div className={styles.myTag}>
-          Bạn là: <strong className={myRole === 'X' ? styles.tagX : styles.tagO}>
-            {myRole === 'X' ? '✕ X' : '○ O'}
-          </strong>
-        </div>
-
-        <button className={styles.leaveBtn} onClick={onLeave}>🚪 Thoát</button>
       </div>
 
-      {/* CENTER */}
-      <div className={styles.center}>
-        <div className={`${styles.status} ${isMyTurn ? styles.statusYou : ''}`}>
-          {isMyTurn ? '⚡ Lượt của bạn!' : `⏳ Chờ ${currentTurn === 'X' ? xName : oName}...`}
-        </div>
-        <Board board={board} myRole={myRole} currentTurn={currentTurn} onMove={onMove} />
+      {/* ── BOARD ── */}
+      <div className={styles.boardWrapper}>
+        <Board
+          board={board}
+          myRole={myRole}
+          currentTurn={currentTurn}
+          onMove={onMove}
+          lastMove={lastMove}
+          winningLine={winningLine}
+          gameOver={gameOver}
+        />
       </div>
 
-      {/* RIGHT */}
-      <div className={styles.right}>
-        <ChatPanel messages={chatMsgs} onSend={onChat} myName={myName} />
+      {/* ── BOTTOM: Chat collapsible + leave ── */}
+      <div className={styles.bottom}>
+        <div className={styles.bottomHeader}>
+          <button className={styles.chatToggle} onClick={() => setChatOpen(o => !o)}>
+            💬 Chat {chatOpen ? '▲' : '▼'}
+          </button>
+          <button className={styles.leaveBtn} onClick={onLeave}>🚪 Thoát</button>
+        </div>
+        {chatOpen && (
+          <ChatPanel messages={chatMsgs} onSend={onChat} myName={myName} />
+        )}
       </div>
     </div>
   );

@@ -1,0 +1,29 @@
+.appContainer {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  position: relative;
+}
+
+.musicOverlay {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  width: 280px;
+  z-index: 900;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  border-radius: 14px;
+}
+
+/* Mobile responsive music widget positioning */
+@media (max-width: 900px) {
+  .musicOverlay {
+    position: static;
+    margin: 12px auto 0;
+    width: 100%;
+    max-width: 560px;
+    padding: 0 8px;
+    box-shadow: none;
+  }
+}

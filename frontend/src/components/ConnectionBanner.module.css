@@ -1,0 +1,14 @@
+.banner {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  background: #0ea5e9;
+  color: #fff;
+  text-align: center;
+  padding: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  animation: slideDown 0.3s ease;
+}
+.banner.error { background: var(--red); }
+@keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }

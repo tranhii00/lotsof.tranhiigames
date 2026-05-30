@@ -1,20 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './MenuScreen.module.css';
 
 export default function MenuScreen({ myName, onCreateRoom, onJoinRoom, joinError }) {
   const [name, setName]     = useState(myName || '');
   const [joinId, setJoinId] = useState('');
-  const [tab, setTab]       = useState('create'); // 'create' | 'join'
+  const [tab, setTab]       = useState('create');
+
+  // Auto-fill room ID from URL ?room=XXXXXX
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const roomParam = params.get('room');
+    if (roomParam && /^[A-Z0-9]{6}$/i.test(roomParam)) {
+      setJoinId(roomParam.toUpperCase());
+      setTab('join');
+    }
+  }, []);
 
   const nameOk = name.trim().length > 0;
+  const canJoin = nameOk && joinId.length === 6;
 
   return (
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.logo}>
-          <span className={styles.logoX}>✕</span>
+          <span className={styles.x}>✕</span>
           <span className={styles.logoTitle}>Cờ Caro</span>
-          <span className={styles.logoO}>○</span>
+          <span className={styles.o}>○</span>
         </div>
         <p className={styles.sub}>Multiplayer · Thời gian thực</p>
 
@@ -25,29 +36,19 @@ export default function MenuScreen({ myName, onCreateRoom, onJoinRoom, joinError
             onChange={e => setName(e.target.value)}
             placeholder="Nhập tên..."
             maxLength={20}
-            onKeyDown={e => e.key === 'Enter' && nameOk && onCreateRoom(name.trim())}
+            autoFocus
           />
         </div>
 
         <div className={styles.tabs}>
-          <button
-            className={tab === 'create' ? styles.tabActive : styles.tab}
-            onClick={() => setTab('create')}
-          >🏠 Tạo phòng</button>
-          <button
-            className={tab === 'join' ? styles.tabActive : styles.tab}
-            onClick={() => setTab('join')}
-          >🔗 Vào phòng</button>
+          <button className={tab === 'create' ? styles.tabActive : styles.tab} onClick={() => setTab('create')}>🏠 Tạo phòng</button>
+          <button className={tab === 'join'   ? styles.tabActive : styles.tab} onClick={() => setTab('join')}>🔗 Vào phòng</button>
         </div>
 
         {tab === 'create' && (
           <div className={styles.section}>
             <p className={styles.hint}>Tạo phòng mới và chia sẻ Room ID cho bạn bè.</p>
-            <button
-              className={styles.btnPrimary}
-              disabled={!nameOk}
-              onClick={() => onCreateRoom(name.trim())}
-            >
+            <button className={styles.btnPrimary} disabled={!nameOk} onClick={() => onCreateRoom(name.trim())}>
               Tạo phòng ngay ✨
             </button>
           </div>
@@ -62,16 +63,12 @@ export default function MenuScreen({ myName, onCreateRoom, onJoinRoom, joinError
                 onChange={e => setJoinId(e.target.value.toUpperCase())}
                 placeholder="VD: AB3C7X"
                 maxLength={6}
-                style={{ textTransform: 'uppercase', letterSpacing: '4px', fontSize: '20px', textAlign: 'center' }}
-                onKeyDown={e => e.key === 'Enter' && nameOk && joinId.length === 6 && onJoinRoom(name.trim(), joinId)}
+                style={{ letterSpacing: '5px', fontSize: '22px', textAlign: 'center', textTransform: 'uppercase' }}
+                onKeyDown={e => e.key === 'Enter' && canJoin && onJoinRoom(name.trim(), joinId)}
               />
             </div>
             {joinError && <p className={styles.error}>⚠️ {joinError}</p>}
-            <button
-              className={styles.btnPrimary}
-              disabled={!nameOk || joinId.length !== 6}
-              onClick={() => onJoinRoom(name.trim(), joinId)}
-            >
+            <button className={styles.btnPrimary} disabled={!canJoin} onClick={() => onJoinRoom(name.trim(), joinId)}>
               Vào phòng →
             </button>
           </div>

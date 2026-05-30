@@ -1,49 +1,79 @@
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  height: 100%;
-  min-height: 400px;
-}
+.panel { display: flex; flex-direction: column; gap: 8px; height: 100%; }
+
 .header {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--dim);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--border);
+  font-size: 12px; font-weight: 700; color: var(--dim);
+  text-transform: uppercase; letter-spacing: 1px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--border);
 }
+
 .messages {
   flex: 1;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 10px;
+  padding: 10px 8px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   min-height: 0;
-  max-height: 340px;
+  max-height: 320px;
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
-.empty { font-size: 12px; color: var(--dim); text-align: center; padding-top: 10px; font-style: italic; }
 
-.msg { font-size: 13px; line-height: 1.5; }
-.sender { font-weight: 700; color: var(--green); margin-right: 4px; }
-.time { font-size: 10px; color: var(--dim); }
-.text { display: block; color: var(--text); word-break: break-word; }
+.empty { font-size: 12px; color: var(--dim); text-align: center; padding: 16px 0; font-style: italic; }
 
-.inputRow { display: flex; gap: 6px; }
-.inputRow input { flex: 1; padding: 8px 12px; font-size: 13px; min-width: 0; border-radius: 8px; }
-.inputRow button {
-  background: var(--green);
-  color: #fff;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
+/* System messages */
+.systemMsg {
+  font-size: 11px;
+  color: var(--dim);
+  text-align: center;
+  padding: 3px 8px;
+  font-style: italic;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.04);
+  align-self: center;
 }
+
+/* Chat bubbles */
+.msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 90%;
+  gap: 2px;
+}
+.msg.mine   { align-self: flex-end; align-items: flex-end; }
+.msg.theirs { align-self: flex-start; align-items: flex-start; }
+
+.sender { font-size: 10px; font-weight: 700; color: var(--green); padding: 0 4px; }
+
+.bubble {
+  padding: 7px 11px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  word-break: break-word;
+  max-width: 100%;
+}
+.mine .bubble   { background: var(--green); color: #fff; border-bottom-right-radius: 3px; }
+.theirs .bubble { background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-bottom-left-radius: 3px; }
+
+.time { font-size: 10px; color: var(--dim); padding: 0 4px; }
+
+/* Input */
+.inputRow { display: flex; gap: 6px; }
+.inputRow input {
+  flex: 1; padding: 8px 12px; font-size: 13px; min-width: 0;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-family: inherit; outline: none;
+  transition: border-color 0.2s;
+}
+.inputRow input:focus { border-color: var(--green); }
+.inputRow button {
+  background: var(--green); color: #fff;
+  padding: 8px 14px; border-radius: 8px;
+  font-size: 13px; font-weight: 700; white-space: nowrap;
+  border: none; cursor: pointer; transition: all 0.2s;
+}
+.inputRow button:hover { filter: brightness(1.1); }

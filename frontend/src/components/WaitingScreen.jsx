@@ -3,12 +3,21 @@ import styles from './WaitingScreen.module.css';
 
 export default function WaitingScreen({ myName, roomId, onCancel }) {
   const [copied, setCopied] = useState(false);
-  const shareUrl = window.location.href;
 
-  const copy = (text) => {
-    navigator.clipboard.writeText(text).then(() => {
+  // Generate shareable link with ?room=ROOMID
+  const shareUrl = `${window.location.origin}${window.location.pathname}?room=${roomId}`;
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(shareUrl).then(() => {
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 2500);
+    });
+  };
+
+  const copyId = () => {
+    navigator.clipboard.writeText(roomId).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
     });
   };
 
@@ -22,17 +31,22 @@ export default function WaitingScreen({ myName, roomId, onCancel }) {
         <div className={styles.roomBox}>
           <span className={styles.roomLabel}>Room ID của bạn</span>
           <div className={styles.roomId}>{roomId}</div>
-          <button className={styles.copyBtn} onClick={() => copy(roomId)}>
-            {copied ? '✓ Đã sao chép' : 'Sao chép Room ID'}
-          </button>
+          <div className={styles.btnRow}>
+            <button className={styles.copyBtn} onClick={copyId}>
+              {copied ? '✓' : '📋'} Room ID
+            </button>
+            <button className={styles.copyBtn} onClick={copyLink}>
+              {copied ? '✓' : '🔗'} Link
+            </button>
+          </div>
         </div>
 
         <p className={styles.hint}>
-          Gửi Room ID này cho bạn bè.<br />
-          Họ vào game → "Vào phòng" → nhập ID → kết nối!
+          Gửi <strong>Room ID</strong> hoặc <strong>link</strong> cho bạn bè.<br />
+          Bạn bè mở link → tự vào phòng ngay!
         </p>
 
-        <button className={styles.btnDanger} onClick={onCancel}>Huỷ bỏ</button>
+        <button className={styles.btnDanger} onClick={onCancel}>Huỷ tìm trận</button>
       </div>
     </div>
   );
