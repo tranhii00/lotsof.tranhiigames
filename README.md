@@ -1,15 +1,12 @@
-# 🎮 Caro Multiplayer & Word Games (Valorant Style)
-
-Một nền tảng trò chơi giải trí thời gian thực (Real-time Multiplayer Hub) tuyệt đẹp với trải nghiệm chuyên nghiệp, đầy kịch tính lấy cảm hứng từ tựa game **Valorant**. 
+# 🎮 Một vài game Huy đã tạo ra: Caro, Xếp từ tiếng Anh thành câu, Nối từ tiếng Anh
 
 👉 **Chơi ngay trực tuyến tại đây:** [https://bit.ly/tranhiigame](https://bit.ly/tranhiigame)
 
 ---
 
-## 🚀 Các Trò Chơi Nổi Bật
+## 🚀 Xem qua các game nhé:
 
-### 1. ✕◯ Cờ Caro Esport
-*   Đấu trí tuệ thời gian thực mượt mà.
+### 1. ✕◯ Cờ Caro
 *   **Luật chơi:** Đủ 5 quân liên tiếp là thắng (Bị chặn kín 2 đầu thì không tính).
 *   Đếm ngược thời gian suy nghĩ kịch tính cho mỗi lượt đi.
 
@@ -17,24 +14,11 @@ Một nền tảng trò chơi giải trí thời gian thực (Real-time Multipla
 *   Thách thức phản xạ tiếng Anh nhanh nhạy.
 *   Ghép các mảnh từ thành câu hoàn chỉnh và chính xác.
 *   Ai đạt **5 câu đúng trước** sẽ giành chiến thắng chung cuộc!
-*   *Đã sửa lỗi kẹt nút gửi đáp án khi làm sai nhiều lần.*
 
 ### 3. 🔗 Nối Từ Tiếng Anh (Word Chain)
-*   Trận chiến từ vựng nghẹt thở, gõ từ bắt đầu bằng chữ cái cuối của đối thủ.
-*   Độ dài từ bắt buộc từ **3 chữ cái trở lên** (tích hợp bộ từ điển offline DWYL 479,000 từ siêu nhẹ).
-*   Thời gian suy nghĩ là **10 giây** cho mỗi lượt. Chỉ bị trừ HP khi hết giờ (mỗi người có 3 HP), nhập sai từ chỉ hiển thị cảnh báo để sửa lại!
-*   *Đã bỏ chat để tập trung thi đấu tối đa và tự động làm sạch ô nhập chữ sau khi gửi.*
-
----
-
-## 🎨 Trải Nghiệm Chuẩn Esport Valorant
-
-*   ⚡ **Matchmaking Countdown:** Đếm ngược `3` $\rightarrow$ `2` $\rightarrow$ `1` siêu ngầu khi đủ người.
-*   🚨 **Match Found:** Âm thanh bass drop đặc trưng vang dội kèm chữ **MATCH FOUND** khổng lồ nhấp nháy phát sáng phóng to dần đầy kịch tính.
-*   📋 **Rules Check & Ready:** Màn hình hiển thị luật chơi chi tiết cho từng chế độ, người chơi phải nhấn "Sẵn sàng" để đồng bộ trạng thái trước trận.
-*   ⏲️ **Electronic Countdown:** Bộ đếm ngược 3 giây điện tử kèm tiếng bíp cơ học đanh thép trước khi chính thức bắt đầu trận đấu hoặc Rematch.
-*   📱 **Responsive Design:** Tương thích hoàn hảo trên mọi thiết bị di động, máy tính bảng và PC.
-*   🎵 **BGM Player:** Trình phát nhạc nền độc quyền tích hợp ca khúc *Where We Started* (Lost Sky ft. Jex) chạy xuyên suốt cực kỳ thư giãn.
+*   Gõ từ bắt đầu bằng chữ cái cuối của đối thủ.
+*   Độ dài từ bắt buộc từ **3 chữ cái trở lên** (tích hợp bộ từ điển offline DWYL 479,000 từ).
+*   Thời gian suy nghĩ là **10 giây** cho mỗi lượt. Bị trừ HP khi hết giờ (mỗi người có 3 HP), nhập sai từ có cảnh báo để sửa lại!
 
 ---
 
@@ -61,7 +45,7 @@ npm run build
 # Quay lại thư mục gốc và chạy
 node server.js
 ```
-Truy cập: [http://localhost:3001](http://localhost:3001) bằng 2 tab trình duyệt để trải nghiệm thi đấu đối kháng!
+Truy cập: [http://localhost:3001](http://localhost:3001) bằng 2 tab trình duyệt để trải nghiệm game!
 
 ---
 
@@ -71,4 +55,4 @@ Truy cập: [http://localhost:3001](http://localhost:3001) bằng 2 tab trình d
 *   **Backend:** Node.js, Express, Socket.io (Real-time).
 *   **Hosting & Deployment:** Railway, GitHub.
 
-Chúc bạn có những giây phút leo rank vui vẻ cùng bạn bè! 🏆
+Chúc bạn có những trải nghiệm game vui vẻ cùng bạn bè, nếu có lỗi gì thì liên quan đến trải nghiệm thì liên hệ mình qua email/zalo nhé! 🏆
