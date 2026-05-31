@@ -1,0 +1,244 @@
+.screen {
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle at center, #1b2230 0%, #0d121c 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Diagonal stripe pattern background */
+.screen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 70, 85, 0.01) 0px,
+    rgba(255, 70, 85, 0.01) 2px,
+    transparent 2px,
+    transparent 10px
+  );
+  pointer-events: none;
+}
+
+.card {
+  width: 90%;
+  max-width: 550px;
+  background: rgba(20, 26, 35, 0.85);
+  border: 1px solid rgba(255, 70, 85, 0.2);
+  border-radius: 8px;
+  padding: 40px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+  position: relative;
+  overflow: hidden;
+}
+
+.topLeftCorner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 15px;
+  height: 15px;
+  border-top: 3px solid #ff4655;
+  border-left: 3px solid #ff4655;
+}
+
+.bottomRightCorner {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 15px;
+  height: 15px;
+  border-bottom: 3px solid #ff4655;
+  border-right: 3px solid #ff4655;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(255, 70, 85, 0.1);
+  border: 1px solid #ff4655;
+  color: #ff4655;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  border-radius: 3px;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.divider {
+  width: 50px;
+  height: 3px;
+  background: #ff4655;
+  margin: 15px auto 0 auto;
+}
+
+/* Rules list styling */
+.rulesList {
+  margin: 25px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ruleItem {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 14px 18px;
+  border-radius: 6px;
+  border-left: 3px solid rgba(255, 70, 85, 0.4);
+  transition: all 0.2s ease;
+}
+
+.ruleItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-left-color: #ff4655;
+  transform: translateX(3px);
+}
+
+.ruleNum {
+  font-weight: 900;
+  color: #ff4655;
+  margin-right: 14px;
+  font-size: 1.1rem;
+}
+
+.ruleText {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Player Status list */
+.playersBox {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.playersHeader {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.playerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 8px 15px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.playerName {
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.statusTag {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusReady {
+  color: #12ffb2;
+}
+
+.statusPending {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dotReady {
+  background-color: #12ffb2;
+  box-shadow: 0 0 8px #12ffb2;
+  animation: pulseDot 1.5s infinite;
+}
+
+.dotPending {
+  background-color: rgba(255, 255, 255, 0.35);
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Action button */
+.readyBtn {
+  width: 100%;
+  padding: 16px;
+  margin-top: 25px;
+  background: #ff4655; /* Valorant Signature Red */
+  border: none;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(255, 70, 85, 0.3);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.readyBtn:hover:not(:disabled) {
+  background: #ff5b68;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(255, 70, 85, 0.4);
+}
+
+.readyBtn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.readyBtn:disabled {
+  background: rgba(18, 255, 178, 0.15);
+  border: 1px solid #12ffb2;
+  color: #12ffb2;
+  cursor: not-allowed;
+  box-shadow: none;
+}

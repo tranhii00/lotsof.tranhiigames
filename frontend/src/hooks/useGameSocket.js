@@ -34,6 +34,13 @@ export function useGameSocket() {
   const [rematchStatus, setRematchStatus] = useState(null); // { requested: boolean, msg: string }
   const [lobbyStatus, setLobbyStatus] = useState(null); // { requested: boolean, msg: string }
 
+  // Valorant matchmaking / ready countdown states
+  const [showMatchFound, setShowMatchFound] = useState(false);
+  const [rulesGameType, setRulesGameType]   = useState(null);
+  const [readyStatus, setReadyStatus]       = useState({});
+  const [countdownNumber, setCountdownNumber] = useState(null); // 3, 2, 1, 'START!'
+  const [showCountdown, setShowCountdown]   = useState(false);
+
   const myRoleRef = useRef(null);
   myRoleRef.current = myRole;
   const mySocketIdRef = useRef(null);
@@ -58,6 +65,11 @@ export function useGameSocket() {
     setLobbyStatus(null);
     setSsState({ round: 1, words: [], scores: {}, submitResult: null, lastWinner: null, lastAnswer: null });
     setWcState({ activePlayerId: '', currentWord: '', requiredLetter: '', hp: {}, wordList: [], submitResult: null });
+    setShowMatchFound(false);
+    setRulesGameType(null);
+    setReadyStatus({});
+    setCountdownNumber(null);
+    setShowCountdown(false);
   }, []);
 
   useEffect(() => {
@@ -95,17 +107,64 @@ export function useGameSocket() {
       setModal(null);
       setRematchStatus(null);
       setLobbyStatus(null);
+      
+      // Play Match Found sound effect and show overlay
+      sfx.playMatchFound();
+      setShowMatchFound(true);
+      setTimeout(() => {
+        setShowMatchFound(false);
+      }, 2500);
+
       setScreen('lobby');
     });
 
-    // Handle legacy MATCH_FOUND for safety, though ROOM_READY replaces it for entry
-    socket.on(EVENTS.MATCH_FOUND, () => {});
+    socket.on(EVENTS.GAME_SELECTED, ({ gameType, readyStatus: rs }) => {
+      setRulesGameType(gameType);
+      setReadyStatus(rs || {});
+      setScreen('rules_ready');
+    });
+
+    socket.on(EVENTS.READY_UPDATE, ({ readyStatus: rs }) => {
+      setReadyStatus(rs || {});
+    });
+
+    socket.on(EVENTS.START_COUNTDOWN, ({ gameType }) => {
+      setRulesGameType(null);
+      setReadyStatus({});
+      
+      // Start client countdown sequence (3, 2, 1, GO!)
+      setShowCountdown(true);
+      setCountdownNumber(3);
+      sfx.playCountdownBeep(false);
+
+      setTimeout(() => {
+        setCountdownNumber(2);
+        sfx.playCountdownBeep(false);
+      }, 1000);
+
+      setTimeout(() => {
+        setCountdownNumber(1);
+        sfx.playCountdownBeep(false);
+      }, 2000);
+
+      setTimeout(() => {
+        setCountdownNumber('START!');
+        sfx.playCountdownBeep(true);
+      }, 3000);
+
+      setTimeout(() => {
+        setShowCountdown(false);
+        setCountdownNumber(null);
+      }, 3800);
+    });
 
     socket.on(EVENTS.GAME_STARTED, (payload) => {
       setChatMsgs([]);
       setModal(null);
       setRematchStatus(null);
       setLobbyStatus(null);
+      setRulesGameType(null);
+      setReadyStatus({});
       
       if (payload.gameType === GAME_TYPES.CARO) {
         setMyRole(lobbyInfoRef.current?.hostId === mySocketIdRef.current ? 'X' : 'O');
@@ -330,6 +389,10 @@ export function useGameSocket() {
     socket.emit(EVENTS.REQUEST_LOBBY);
   }, []);
 
+  const playerReady = useCallback(() => {
+    socket.emit(EVENTS.PLAYER_READY);
+  }, []);
+
   const leaveRoom = useCallback(() => {
     socket.emit(EVENTS.LEAVE_ROOM);
     resetGame();
@@ -338,7 +401,7 @@ export function useGameSocket() {
 
   const closeModal = useCallback(() => {
     setModal(null);
-    if (screen === 'lobby') {
+    if (screen === 'lobby' || screen === 'rules_ready') {
       // Just hide modal
     } else {
       setScreen('menu');
@@ -353,6 +416,7 @@ export function useGameSocket() {
     ssState, wcState,
     chatMsgs, modal, joinError,
     lastMove, winningLine, rematchStatus, lobbyStatus,
-    actions: { createRoom, joinRoom, selectGame, submitSentence, submitWord, cancelWait, makeMove, sendChat, requestRematch, requestLobby, leaveRoom, closeModal },
+    showMatchFound, rulesGameType, readyStatus, countdownNumber, showCountdown,
+    actions: { createRoom, joinRoom, selectGame, submitSentence, submitWord, cancelWait, makeMove, sendChat, requestRematch, requestLobby, leaveRoom, closeModal, playerReady },
   };
 }

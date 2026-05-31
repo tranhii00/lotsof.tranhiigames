@@ -1,0 +1,86 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(8, 10, 15, 0.92);
+  backdrop-filter: blur(8px);
+  z-index: 10000; /* Higher than match found overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+.container {
+  position: relative;
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Pulsating number styling */
+.number {
+  font-size: 8rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #ff4655; /* Valorant Red */
+  text-shadow: 
+    0 0 20px rgba(255, 70, 85, 0.6),
+    0 0 60px rgba(255, 70, 85, 0.9);
+  animation: numPulse 1s cubic-bezier(0.075, 0.82, 0.165, 1) infinite;
+  display: inline-block;
+  margin: 0;
+}
+
+/* Specific styling for START text */
+.number.goText {
+  font-size: 5rem;
+  color: #12ffb2; /* Neon active green */
+  text-shadow: 
+    0 0 20px rgba(18, 255, 178, 0.6),
+    0 0 60px rgba(18, 255, 178, 0.9);
+  letter-spacing: 2px;
+  animation: numPulse 0.8s ease-in-out infinite;
+}
+
+@keyframes numPulse {
+  0% { transform: scale(0.65); opacity: 0.2; }
+  10% { transform: scale(1.1); opacity: 1; }
+  90% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.3; }
+}
+
+.subtext {
+  margin-top: 30px;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+/* Hexagon warning stripes at bottom/top */
+.stripes {
+  position: absolute;
+  width: 100%;
+  height: 6px;
+  left: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    #ff4655,
+    #ff4655 10px,
+    #141a23 10px,
+    #141a23 20px
+  );
+  opacity: 0.7;
+}
+
+.stripesTop {
+  top: -40px;
+}
+
+.stripesBottom {
+  bottom: -40px;
+}

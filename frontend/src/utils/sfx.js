@@ -166,5 +166,37 @@ export const sfx = {
       osc.start();
       osc.stop(c.currentTime + 0.15);
     } catch (e) {}
+  },
+
+  // Play Valorant Match Found sound
+  playMatchFound() {
+    try {
+      const audio = new Audio('/match-found-valorant.mp3');
+      audio.volume = globalSfxVolume;
+      audio.play().catch(err => console.warn("Audio autoplay blocked or failed:", err));
+    } catch (e) {
+      console.warn('Failed to play match-found sfx:', e);
+    }
+  },
+
+  // Play electronic countdown beeps (3, 2, 1, GO!)
+  playCountdownBeep(isGo = false) {
+    try {
+      const c = getContext();
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+
+      osc.connect(gain);
+      gain.connect(c.destination);
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(isGo ? 987.77 : 493.88, c.currentTime);
+
+      gain.gain.setValueAtTime((isGo ? 0.8 : 0.65) * globalSfxVolume, c.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + (isGo ? 0.45 : 0.15));
+
+      osc.start();
+      osc.stop(c.currentTime + (isGo ? 0.5 : 0.2));
+    } catch (e) {}
   }
 };

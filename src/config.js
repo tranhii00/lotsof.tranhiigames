@@ -18,6 +18,7 @@ const EVENTS = {
   CANCEL_ROOM: 'cancel_room',
   REQUEST_REMATCH: 'request_rematch',
   CHANGE_MUSIC:    'change_music',
+  PLAYER_READY:    'player_ready',
   
   // Lobby Events
   SELECT_GAME: 'select_game',
@@ -46,6 +47,8 @@ const EVENTS = {
   REMATCH_UPDATE:         'rematch_update',
   REMATCH_START:          'rematch_start',
   MUSIC_SYNC:             'music_sync',
+  READY_UPDATE:           'ready_update',
+  START_COUNTDOWN:        'start_countdown',
 
   // Sentence Scramble Events (Server → Client)
   SENTENCE_ROUND_STARTED: 'sentence_round_started',

@@ -136,6 +136,76 @@ function endWordChainGame(io, roomId, loserId) {
   }
 }
 
+function initializeGame(io, room, playerIds) {
+  const gameType = room.selectedGame;
+  const rid = room.id;
+
+  if (gameType === GAME_TYPES.CARO) {
+    const host = Object.values(room.players).find(p => p.role === 'host');
+    const guest = Object.values(room.players).find(p => p.role === 'guest');
+    host.caroRole = 'X';
+    guest.caroRole = 'O';
+
+    room.gameState = {
+      board: emptyBoard(),
+      turn: 'X',
+      lastWinner: null,
+      rematchRequests: {},
+      lobbyRequests: {}
+    };
+    
+    io.to(rid).emit(EVENTS.GAME_STARTED, { 
+      gameType, 
+      turn: 'X',
+      hostRole: 'X'
+    });
+    io.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg(`🎮 Bắt đầu Cờ Caro!`));
+    startCaroTimer(io, rid);
+
+  } else if (gameType === GAME_TYPES.SENTENCE_SCRAMBLE) {
+    const matchSentences = getMatchSentences(5);
+    room.gameState = {
+      targetScore: 5,
+      matchSentences,
+      rematchRequests: {},
+      lobbyRequests: {},
+      scores: createSentenceScores(room.players),
+      playersState: createSentencePlayerState(room.players)
+    };
+
+    io.to(rid).emit(EVENTS.GAME_STARTED, { gameType });
+    io.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg(`🧩 Bắt đầu Đua Xếp Câu! Ai đạt 5 điểm trước sẽ thắng.`));
+
+    Object.keys(room.players).forEach(id => {
+      emitSentenceRoundToPlayer(io, id, room.gameState);
+    });
+
+  } else if (gameType === GAME_TYPES.WORD_CHAIN) {
+    const starterWord = getRandomStarter();
+    const initialHp = {};
+    Object.keys(room.players).forEach(id => {
+      initialHp[id] = 3;
+    });
+
+    const hostId = Object.keys(room.players).find(id => room.players[id].role === 'host');
+
+    room.gameState = {
+      hp: initialHp,
+      usedWords: [starterWord],
+      currentWord: starterWord,
+      activePlayerId: hostId, // Host starts first
+      rematchRequests: {},
+      lobbyRequests: {}
+    };
+
+    io.to(rid).emit(EVENTS.GAME_STARTED, { gameType });
+    io.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg(`🗣️ Bắt đầu Nối Từ Tiếng Anh! Lượt đầu thuộc về ${room.players[hostId].name}. Chữ cái cần nối: "${starterWord.slice(-1).toUpperCase()}".`));
+
+    startWordChainRound(io, rid);
+  }
+}
+
+
 module.exports = function registerHandlers(io) {
   io.on('connection', (socket) => {
     console.log(`[+] ${socket.id} | rooms: ${getRoomCount()}`);
@@ -214,73 +284,49 @@ module.exports = function registerHandlers(io) {
         return;
       }
 
-      console.log(`[SELECT_GAME] Success! Starting ${gameType} for room ${rid}`);
+      console.log(`[SELECT_GAME] Entering Rules Ready stage for ${gameType} in room ${rid}`);
       room.selectedGame = gameType;
-      room.status = 'playing';
+      room.status = 'rules_ready';
+      room.readyStatus = {};
+      Object.keys(room.players).forEach(id => {
+        room.readyStatus[id] = false;
+      });
 
-      io.to(rid).emit(EVENTS.GAME_SELECTED, { gameType });
+      io.to(rid).emit(EVENTS.GAME_SELECTED, { gameType, readyStatus: room.readyStatus });
+    });
 
-      // Initialize game state based on type
-      if (gameType === GAME_TYPES.CARO) {
-        const players = Object.values(room.players);
-        players.find(p => p.role === 'host').caroRole = 'X';
-        players.find(p => p.role === 'guest').caroRole = 'O';
+    // ── PLAYER READY ──────────────────────────────────────────
+    socket.on(EVENTS.PLAYER_READY, () => {
+      const rid = socket.roomId;
+      const room = rid && getRoom(rid);
+      if (!room || room.status !== 'rules_ready') return;
 
-        room.gameState = {
-          board: emptyBoard(),
-          turn: 'X',
-          lastWinner: null,
-          rematchRequests: {},
-          lobbyRequests: {}
-        };
-        
-        io.to(rid).emit(EVENTS.GAME_STARTED, { 
-          gameType, 
-          turn: 'X',
-          hostRole: 'X'
-        });
-        io.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg(`🎮 Bắt đầu Cờ Caro!`));
-        startCaroTimer(io, rid);
+      if (!room.readyStatus) room.readyStatus = {};
+      room.readyStatus[socket.id] = true;
 
-      } else if (gameType === GAME_TYPES.SENTENCE_SCRAMBLE) {
-        const matchSentences = getMatchSentences(5);
-        room.gameState = {
-          targetScore: 5,
-          matchSentences,
-          rematchRequests: {},
-          lobbyRequests: {},
-          scores: createSentenceScores(room.players),
-          playersState: createSentencePlayerState(room.players)
-        };
+      // Emit updated ready status to both players
+      io.to(rid).emit(EVENTS.READY_UPDATE, { readyStatus: room.readyStatus });
 
-        io.to(rid).emit(EVENTS.GAME_STARTED, { gameType });
-        io.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg(`🧩 Bắt đầu Đua Xếp Câu! Ai đạt 5 điểm trước sẽ thắng.`));
+      // Check if both players are ready
+      const playerIds = Object.keys(room.players);
+      const allReady = playerIds.every(id => room.readyStatus[id] === true);
 
-        Object.keys(room.players).forEach(id => {
-          emitSentenceRoundToPlayer(io, id, room.gameState);
-        });
-      } else if (gameType === GAME_TYPES.WORD_CHAIN) {
-        const starterWord = getRandomStarter();
-        const initialHp = {};
-        Object.keys(room.players).forEach(id => {
-          initialHp[id] = 3;
-        });
+      if (allReady) {
+        console.log(`[READY] Both players ready in room ${rid}. Starting 3s countdown!`);
+        room.status = 'playing';
 
-        room.gameState = {
-          hp: initialHp,
-          usedWords: [starterWord],
-          currentWord: starterWord,
-          activePlayerId: socket.id, // Host starts first
-          rematchRequests: {},
-          lobbyRequests: {}
-        };
+        // Broadcast COUNTDOWN start event
+        io.to(rid).emit(EVENTS.START_COUNTDOWN, { gameType: room.selectedGame });
 
-        io.to(rid).emit(EVENTS.GAME_STARTED, { gameType });
-        io.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg(`🗣️ Bắt đầu Nối Từ Tiếng Anh! Lượt đầu thuộc về ${room.players[socket.id].name}. Chữ cái cần nối: "${starterWord.slice(-1).toUpperCase()}".`));
-
-        startWordChainRound(io, rid);
+        // Wait 3.5 seconds for client countdown display before initiating the game loop
+        setTimeout(() => {
+          const r = getRoom(rid);
+          if (!r || r.status !== 'playing') return;
+          initializeGame(io, r, playerIds);
+        }, 3500);
       }
     });
+
 
     // ── CARO: MAKE MOVE ───────────────────────────────────────
     socket.on(EVENTS.MAKE_MOVE, (payload) => {
@@ -459,54 +505,19 @@ module.exports = function registerHandlers(io) {
       } else if (requesters.length >= 2) {
         // Clear rematch and restart CURRENT game type!
         room.status = 'playing';
-        room.gameState.rematchRequests = {};
-
-        if (room.selectedGame === GAME_TYPES.CARO) {
-          room.gameState.board = emptyBoard();
-          room.gameState.turn = room.gameState.lastWinner || 'X';
-          
-          const xId = players.find(id => room.players[id].caroRole === 'X');
-          const oId = players.find(id => room.players[id].caroRole === 'O');
-
-          io.to(xId).emit(EVENTS.REMATCH_START, { turn: room.gameState.turn, board: room.gameState.board });
-          io.to(oId).emit(EVENTS.REMATCH_START, { turn: room.gameState.turn, board: room.gameState.board });
-          io.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg(`🎮 Ván mới bắt đầu! Lượt đi đầu tiên: ${room.gameState.turn}`));
-          startCaroTimer(io, rid);
-        } else if (room.selectedGame === GAME_TYPES.SENTENCE_SCRAMBLE) {
-          const matchSentences = getMatchSentences(5);
-          room.gameState.targetScore = 5;
-          room.gameState.matchSentences = matchSentences;
-          room.gameState.scores = createSentenceScores(room.players);
-          room.gameState.playersState = createSentencePlayerState(room.players);
-
-          // Re-emit game started to clear modals and reset UI
-          io.to(rid).emit(EVENTS.GAME_STARTED, { gameType: GAME_TYPES.SENTENCE_SCRAMBLE });
-          io.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg(`🧩 Đua Xếp Câu ván mới bắt đầu!`));
-
-          Object.keys(room.players).forEach(id => {
-            emitSentenceRoundToPlayer(io, id, room.gameState);
-          });
-        } else if (room.selectedGame === GAME_TYPES.WORD_CHAIN) {
-          const starterWord = getRandomStarter();
-          const initialHp = {};
-          Object.keys(room.players).forEach(id => {
-            initialHp[id] = 3;
-          });
-
-          room.gameState = {
-            hp: initialHp,
-            usedWords: [starterWord],
-            currentWord: starterWord,
-            activePlayerId: socket.id, // Whoever triggers the start goes first
-            rematchRequests: {},
-            lobbyRequests: {}
-          };
-
-          io.to(rid).emit(EVENTS.GAME_STARTED, { gameType: GAME_TYPES.WORD_CHAIN });
-          io.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg(`🗣️ Nối Từ Tiếng Anh ván mới bắt đầu! Lượt đầu thuộc về ${room.players[socket.id].name}. Chữ cái cần nối: "${starterWord.slice(-1).toUpperCase()}".`));
-
-          startWordChainRound(io, rid);
+        if (room.gameState) {
+          room.gameState.rematchRequests = {};
         }
+
+        console.log(`[REMATCH] Both accepted. Starting 3s countdown before rematch in room ${rid}`);
+        io.to(rid).emit(EVENTS.START_COUNTDOWN, { gameType: room.selectedGame });
+
+        // Wait 3.5 seconds for client countdown display before initiating the game loop
+        setTimeout(() => {
+          const r = getRoom(rid);
+          if (!r || r.status !== 'playing') return;
+          initializeGame(io, r, players);
+        }, 3500);
       }
     });
 

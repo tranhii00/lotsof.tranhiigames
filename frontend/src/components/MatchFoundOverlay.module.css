@@ -1,0 +1,186 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(10, 15, 23, 0.95);
+  backdrop-filter: blur(12px);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+/* Background animated grid scanlines */
+.grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(rgba(18, 255, 178, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 255, 178, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center;
+  animation: gridScroll 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes gridScroll {
+  from { background-position: 0 0; }
+  to { background-position: 40px 40px; }
+}
+
+.scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to bottom, rgba(18, 255, 178, 0.3), transparent);
+  animation: scan 3s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes scan {
+  0% { transform: translateY(-10vh); }
+  100% { transform: translateY(110vh); }
+}
+
+/* Central container */
+.container {
+  text-align: center;
+  position: relative;
+  width: 90%;
+  max-width: 600px;
+  padding: 40px;
+  border-radius: 4px;
+  border-left: 5px solid #ff4655; /* Valorant Red */
+  border-right: 5px solid #ff4655;
+  background: linear-gradient(135deg, rgba(20, 26, 35, 0.9) 0%, rgba(12, 17, 24, 0.95) 100%);
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.8),
+    inset 0 0 40px rgba(255, 70, 85, 0.05);
+  animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Corner bracket accents */
+.corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 70, 85, 0.4);
+  pointer-events: none;
+}
+
+.topLeft {
+  top: 10px;
+  left: 10px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.topRight {
+  top: 10px;
+  right: 10px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.bottomLeft {
+  bottom: 10px;
+  left: 10px;
+  border-right: none;
+  border-top: none;
+}
+
+.bottomRight {
+  bottom: 10px;
+  right: 10px;
+  border-left: none;
+  border-top: none;
+}
+
+/* Match Found text */
+.titleContainer {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: 6px;
+  color: #ffffff;
+  text-shadow: 
+    0 0 10px rgba(255, 255, 255, 0.3),
+    0 0 30px rgba(255, 70, 85, 0.6);
+  margin: 0;
+  text-transform: uppercase;
+  animation: pulseGlow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% { text-shadow: 0 0 10px rgba(255, 255, 255, 0.3), 0 0 30px rgba(255, 70, 85, 0.4); }
+  100% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 50px rgba(255, 70, 85, 0.9); }
+}
+
+.accentBar {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ff4655 20%, #ff4655 80%, transparent);
+  margin: 15px auto 0 auto;
+}
+
+/* Versus Details */
+.versusInfo {
+  margin-top: 25px;
+}
+
+.vsLabel {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+}
+
+.opponentName {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #ff4655; /* Valorant Red signature */
+  text-shadow: 0 0 15px rgba(255, 70, 85, 0.3);
+  letter-spacing: 2px;
+  margin: 0;
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.15s;
+}
+
+.readyText {
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: #12ffb2; /* Valorant neon active green */
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(15px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

@@ -8,6 +8,9 @@ import SentenceScrambleScreen from './components/SentenceScrambleScreen';
 import WordChainScreen from './components/WordChainScreen';
 import Modal from './components/Modal';
 import MusicPlayer from './components/MusicPlayer';
+import MatchFoundOverlay from './components/MatchFoundOverlay';
+import CountdownOverlay from './components/CountdownOverlay';
+import RulesReadyScreen from './components/RulesReadyScreen';
 import styles from './App.module.css';
 
 export default function App() {
@@ -18,6 +21,7 @@ export default function App() {
     ssState, wcState,
     chatMsgs, modal, joinError,
     lastMove, winningLine, rematchStatus, lobbyStatus,
+    showMatchFound, rulesGameType, readyStatus, countdownNumber, showCountdown,
     actions,
   } = useGameSocket();
 
@@ -29,6 +33,14 @@ export default function App() {
       <div className={styles.musicOverlay}>
         <MusicPlayer />
       </div>
+
+      {showMatchFound && (
+        <MatchFoundOverlay opponentName={opponentName} />
+      )}
+
+      {showCountdown && (
+        <CountdownOverlay number={countdownNumber} />
+      )}
 
       {screen === 'menu' && (
         <MenuScreen
@@ -97,6 +109,16 @@ export default function App() {
           onChat={actions.sendChat}
           chatMsgs={chatMsgs}
           timerInfo={timerInfo}
+        />
+      )}
+
+      {screen === 'rules_ready' && rulesGameType && (
+        <RulesReadyScreen
+          gameType={rulesGameType}
+          readyStatus={readyStatus}
+          lobbyInfo={lobbyInfo}
+          socketId={socketId}
+          onReady={actions.playerReady}
         />
       )}
 
