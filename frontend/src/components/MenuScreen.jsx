@@ -24,7 +24,7 @@ export default function MenuScreen({ myName, onCreateRoom, onJoinRoom, joinError
       <div className={styles.card}>
         <div className={styles.logo}>
           <span className={styles.x}>✕</span>
-          <span className={styles.logoTitle} style={{ fontSize: '2rem' }}>MINI ONLINE GAMES</span>
+          <span className={styles.logoTitle}>MINI ONLINE GAMES</span>
           <span className={styles.o}>○</span>
         </div>
         <p className={styles.sub} style={{ fontSize: '0.8rem', opacity: 0.85, letterSpacing: '0.5px' }}>
