@@ -40,6 +40,7 @@ export function useGameSocket() {
   const [readyStatus, setReadyStatus]       = useState({});
   const [countdownNumber, setCountdownNumber] = useState(null); // 3, 2, 1, 'START!'
   const [showCountdown, setShowCountdown]   = useState(false);
+  const [matchmakingCountdown, setMatchmakingCountdown] = useState(null);
 
   const myRoleRef = useRef(null);
   myRoleRef.current = myRole;
@@ -108,12 +109,26 @@ export function useGameSocket() {
       setRematchStatus(null);
       setLobbyStatus(null);
       
-      // Play Match Found sound effect and show overlay
-      sfx.playMatchFound();
-      setShowMatchFound(true);
+      // Start matchmaking countdown: 3 -> 2 -> 1 -> Match Found! (no sounds for numbers)
+      setMatchmakingCountdown(3);
+      
       setTimeout(() => {
-        setShowMatchFound(false);
-      }, 2500);
+        setMatchmakingCountdown(2);
+      }, 1000);
+
+      setTimeout(() => {
+        setMatchmakingCountdown(1);
+      }, 2000);
+
+      setTimeout(() => {
+        setMatchmakingCountdown(null);
+        // Play Match Found sound effect and show overlay
+        sfx.playMatchFound();
+        setShowMatchFound(true);
+        setTimeout(() => {
+          setShowMatchFound(false);
+        }, 2500);
+      }, 3000);
 
       setScreen('lobby');
     });
@@ -416,7 +431,7 @@ export function useGameSocket() {
     ssState, wcState,
     chatMsgs, modal, joinError,
     lastMove, winningLine, rematchStatus, lobbyStatus,
-    showMatchFound, rulesGameType, readyStatus, countdownNumber, showCountdown,
+    showMatchFound, rulesGameType, readyStatus, countdownNumber, showCountdown, matchmakingCountdown,
     actions: { createRoom, joinRoom, selectGame, submitSentence, submitWord, cancelWait, makeMove, sendChat, requestRematch, requestLobby, leaveRoom, closeModal, playerReady },
   };
 }

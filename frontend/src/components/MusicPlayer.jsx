@@ -95,11 +95,9 @@ export default function MusicPlayer() {
       </div>
 
       <div className={styles.controls}>
-        <button onClick={handlePrev} className={styles.btn} title="Bài trước">⏮</button>
-        <button onClick={handlePlayPause} className={`${styles.btn} ${styles.playBtn}`} title={playing ? 'Tạm dừng' : 'Chạy nhạc'}>
-          {playing ? '⏸' : '▶'}
+        <button onClick={handlePlayPause} className={`${styles.btn} ${styles.playBtn}`} style={{ padding: '6px 12px', fontSize: '0.85rem' }} title={playing ? 'Tạm dừng BGM' : 'Chạy BGM'}>
+          {playing ? 'TẠM DỪNG BGM ⏸' : 'BẬT NHẠC NỀN ▶'}
         </button>
-        <button onClick={handleNext} className={styles.btn} title="Bài tiếp">⏭</button>
       </div>
 
       <div className={styles.volRow}>

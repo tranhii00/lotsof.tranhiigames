@@ -1,49 +1,9 @@
-// Direct streaming music URLs for Hayd's tracks and user's custom MP3
+// Direct streaming music URLs for user's custom MP3
 export const HAYD_TRACKS = [
   {
     title: 'Where We Started (Your Custom Song) ⚡',
     artist: 'Lost Sky ft. Jex',
     url: '/bgm.mp3', // Plays the local bgm.mp3 file directly!
-  },
-  {
-    title: 'Head In The Clouds',
-    artist: 'Hayd',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-  },
-  {
-    title: 'Closure',
-    artist: 'Hayd',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-  },
-  {
-    title: 'How Long, How Low?',
-    artist: 'Hayd, Chance Peña',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-  },
-  {
-    title: 'What Did I Do?',
-    artist: 'Hayd',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
-  },
-  {
-    title: 'All of the Stars',
-    artist: 'Hayd',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
-  },
-  {
-    title: 'Changes',
-    artist: 'Hayd',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
-  },
-  {
-    title: 'When You Were Mine',
-    artist: 'Hayd',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
-  },
-  {
-    title: 'Lost',
-    artist: 'Hayd',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
   }
 ];
 

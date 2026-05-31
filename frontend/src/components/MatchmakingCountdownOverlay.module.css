@@ -1,0 +1,54 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(8, 10, 15, 0.94);
+  backdrop-filter: blur(16px);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  overflow: hidden;
+}
+
+.container {
+  text-align: center;
+}
+
+.number {
+  font-size: 9rem;
+  font-weight: 900;
+  color: #ff4655; /* Valorant signature red */
+  text-shadow: 
+    0 0 20px rgba(255, 70, 85, 0.6),
+    0 0 60px rgba(255, 70, 85, 0.9);
+  animation: growAndFade 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  margin: 0;
+  pointer-events: none;
+}
+
+@keyframes growAndFade {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+    filter: blur(6px);
+  }
+  15% {
+    transform: scale(1);
+    opacity: 1;
+    filter: blur(0px);
+  }
+  85% {
+    transform: scale(1.05);
+    opacity: 1;
+    filter: blur(0px);
+  }
+  100% {
+    transform: scale(1.15);
+    opacity: 0;
+    filter: blur(4px);
+  }
+}

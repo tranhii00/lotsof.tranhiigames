@@ -10,6 +10,7 @@ import Modal from './components/Modal';
 import MusicPlayer from './components/MusicPlayer';
 import MatchFoundOverlay from './components/MatchFoundOverlay';
 import CountdownOverlay from './components/CountdownOverlay';
+import MatchmakingCountdownOverlay from './components/MatchmakingCountdownOverlay';
 import RulesReadyScreen from './components/RulesReadyScreen';
 import styles from './App.module.css';
 
@@ -21,7 +22,7 @@ export default function App() {
     ssState, wcState,
     chatMsgs, modal, joinError,
     lastMove, winningLine, rematchStatus, lobbyStatus,
-    showMatchFound, rulesGameType, readyStatus, countdownNumber, showCountdown,
+    showMatchFound, rulesGameType, readyStatus, countdownNumber, showCountdown, matchmakingCountdown,
     actions,
   } = useGameSocket();
 
@@ -33,6 +34,10 @@ export default function App() {
       <div className={styles.musicOverlay}>
         <MusicPlayer />
       </div>
+
+      {matchmakingCountdown && (
+        <MatchmakingCountdownOverlay number={matchmakingCountdown} />
+      )}
 
       {showMatchFound && (
         <MatchFoundOverlay opponentName={opponentName} />

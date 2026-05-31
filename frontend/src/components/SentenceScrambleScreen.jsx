@@ -46,16 +46,19 @@ export default function SentenceScrambleScreen({
   const handlePoolClick = (wordObj) => {
     setPool(prev => prev.filter(w => w.id !== wordObj.id));
     setAnswer(prev => [...prev, wordObj]);
+    setIsSubmitting(false); // Reset submit lock
   };
 
   const handleAnswerClick = (wordObj) => {
     setAnswer(prev => prev.filter(w => w.id !== wordObj.id));
     setPool(prev => [...prev, wordObj]);
+    setIsSubmitting(false); // Reset submit lock
   };
 
   const handleReset = () => {
     setPool([...pool, ...answer]);
     setAnswer([]);
+    setIsSubmitting(false); // Reset submit lock
   };
 
   const handleSubmit = () => {

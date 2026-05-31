@@ -242,3 +242,25 @@
   cursor: not-allowed;
   box-shadow: none;
 }
+
+@media (max-width: 480px) {
+  .card {
+    padding: 24px 16px;
+    width: 95%;
+  }
+  .title {
+    font-size: 1.6rem;
+  }
+  .ruleText {
+    font-size: 0.85rem;
+  }
+  .readyBtn {
+    padding: 12px;
+    font-size: 0.9rem;
+    margin-top: 15px;
+  }
+  .ruleItem {
+    padding: 10px 14px;
+    margin-bottom: 12px;
+  }
+}

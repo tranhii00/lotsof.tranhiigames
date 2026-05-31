@@ -62,6 +62,7 @@ export default function WordChainScreen({
     if (!word) return;
     setIsSubmitting(true);
     onSubmit(word);
+    setTypedWord(''); // Clear the input field immediately on submit!
   };
 
   // HP rendering helper

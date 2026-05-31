@@ -440,23 +440,18 @@ module.exports = function registerHandlers(io) {
       // 1. Must start with requiredLetter
       if (rawWord[0] !== requiredLetter) {
         socket.emit(EVENTS.WORD_VALIDATION_RESULT, { correct: false, reason: `Từ phải bắt đầu bằng chữ "${requiredLetter.toUpperCase()}"!` });
-        // Deduct 1 HP for wrong answer
-        gs.hp[socket.id] = Math.max(0, gs.hp[socket.id] - 1);
-        io.to(rid).emit(EVENTS.WORD_HP_UPDATE, { hp: gs.hp });
-        if (gs.hp[socket.id] <= 0) {
-          endWordChainGame(io, rid, socket.id);
-        }
         return;
       }
 
-      // 2. Must not be already used
+      // 2. Must be at least 3 characters
+      if (rawWord.length < 3) {
+        socket.emit(EVENTS.WORD_VALIDATION_RESULT, { correct: false, reason: 'Từ phải có độ dài từ 3 chữ cái trở lên!' });
+        return;
+      }
+
+      // 3. Must not be already used
       if (gs.usedWords.includes(rawWord)) {
         socket.emit(EVENTS.WORD_VALIDATION_RESULT, { correct: false, reason: `Từ "${rawWord.toUpperCase()}" đã được sử dụng rồi!` });
-        gs.hp[socket.id] = Math.max(0, gs.hp[socket.id] - 1);
-        io.to(rid).emit(EVENTS.WORD_HP_UPDATE, { hp: gs.hp });
-        if (gs.hp[socket.id] <= 0) {
-          endWordChainGame(io, rid, socket.id);
-        }
         return;
       }
 
@@ -464,11 +459,6 @@ module.exports = function registerHandlers(io) {
       const valid = await isValidWord(rawWord);
       if (!valid) {
         socket.emit(EVENTS.WORD_VALIDATION_RESULT, { correct: false, reason: `Từ "${rawWord.toUpperCase()}" không hợp lệ!` });
-        gs.hp[socket.id] = Math.max(0, gs.hp[socket.id] - 1);
-        io.to(rid).emit(EVENTS.WORD_HP_UPDATE, { hp: gs.hp });
-        if (gs.hp[socket.id] <= 0) {
-          endWordChainGame(io, rid, socket.id);
-        }
         return;
       }
 
