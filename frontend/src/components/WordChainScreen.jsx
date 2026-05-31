@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './WordChainScreen.module.css';
-import ChatPanel from './ChatPanel';
 import Timer from './Timer';
 
 export default function WordChainScreen({
@@ -185,11 +184,6 @@ export default function WordChainScreen({
             ))}
           </div>
         </div>
-      </div>
-
-      {/* Chat Section */}
-      <div className={styles.chatSection}>
-        <ChatPanel messages={chatMsgs} onSendMessage={onChat} />
       </div>
     </div>
   );

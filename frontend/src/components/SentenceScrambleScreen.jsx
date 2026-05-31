@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import styles from './SentenceScrambleScreen.module.css';
-import ChatPanel from './ChatPanel';
 
 export default function SentenceScrambleScreen({ 
   ssState, 
@@ -129,10 +128,6 @@ export default function SentenceScrambleScreen({
         {showSuccess && (
           <p className={styles.successMsg}>✓ Chính xác! Bạn nhận +1 điểm.</p>
         )}
-      </div>
-
-      <div className={styles.chatSection}>
-        <ChatPanel messages={chatMsgs} onSendMessage={onChat} />
       </div>
     </div>
   );

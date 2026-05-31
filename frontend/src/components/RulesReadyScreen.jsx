@@ -6,18 +6,16 @@ const RULES = {
     title: 'CỜ CARO',
     badge: 'ĐẤU TRÍ CHIẾN THUẬT',
     items: [
-      'Đấu trí tuệ 5 nước thắng hàng ngang/dọc/chéo.',
-      'Bạn có thể chặn hai đầu để phòng ngự hoặc tấn công.',
-      'Thời gian suy nghĩ cho mỗi nước đi là 30 giây.'
+      'Đủ 5 quân liên tiếp là thắng.',
+      'Bị chặn kín 2 đầu thì không tính.'
     ]
   },
   sentence_scramble: {
     title: 'ĐUA XẾP CÂU',
     badge: 'PHẢN XẠ TIẾNG ANH',
     items: [
-      'Ghép các mảnh từ thành câu tiếng Anh hoàn chỉnh có nghĩa.',
-      'Ai hoàn thành đúng câu nhanh nhất sẽ giành điểm vòng.',
-      'Ván đấu gồm 5 vòng. Ai đạt 5 điểm trước sẽ thắng cuộc!'
+      'Ghép các mảnh từ thành câu tiếng Anh hoàn chỉnh.',
+      'Đúng 5 câu trước sẽ giành chiến thắng.'
     ]
   },
   word_chain: {
@@ -25,7 +23,7 @@ const RULES = {
     badge: 'NỐI TỪ KỊCH TÍNH',
     items: [
       'Gõ từ tiếng Anh bắt đầu bằng chữ cái cuối của từ đối thủ.',
-      'Độ dài từ bắt buộc từ 3 chữ cái trở lên (tra cứu từ điển offline 479,000 từ).',
+      'Độ dài từ bắt buộc từ 3 chữ cái trở lên.',
       'Thời gian nghĩ là 10 giây. Nhập sai từ hoặc hết giờ sẽ bị trừ 1 HP (mỗi người có 3 HP).'
     ]
   }
@@ -59,7 +57,6 @@ export default function RulesReadyScreen({ gameType, readyStatus, lobbyInfo, soc
         </ul>
         
         <div className={styles.playersBox}>
-          <div className={styles.playersHeader}>TRẠNG THÁI ĐỒNG BỘ PHÒNG</div>
           {Object.keys(players).map(id => {
             const p = players[id];
             const isReady = readyStatus[id] === true;
