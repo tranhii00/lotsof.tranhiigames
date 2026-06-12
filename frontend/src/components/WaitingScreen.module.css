@@ -32,3 +32,23 @@
   padding: 11px 28px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;
 }
 .btnDanger:hover { filter: brightness(1.1); }
+
+.playerAvatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  border: 3px solid #fff;
+  animation: bounceAvatar 2s infinite ease-in-out;
+}
+@keyframes bounceAvatar {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.playerEmoji {
+  font-size: 38px;
+}

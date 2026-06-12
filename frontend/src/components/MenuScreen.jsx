@@ -1,10 +1,22 @@
 import { useState, useEffect } from 'react';
 import styles from './MenuScreen.module.css';
 
+const AVATARS = [
+  { id: 'fox', emoji: '🦊', color: '#FF7A00' },
+  { id: 'panda', emoji: '🐼', color: '#4E5D6C' },
+  { id: 'unicorn', emoji: '🦄', color: '#E040FB' },
+  { id: 'frog', emoji: '🐸', color: '#4CAF50' },
+  { id: 'lion', emoji: '🦁', color: '#FFB800' },
+  { id: 'octopus', emoji: '🐙', color: '#FF5252' },
+  { id: 'dino', emoji: '🦖', color: '#8BC34A' },
+  { id: 'penguin', emoji: '🐧', color: '#00BCD4' }
+];
+
 export default function MenuScreen({ myName, onCreateRoom, onJoinRoom, joinError }) {
   const [name, setName]     = useState(myName || '');
   const [joinId, setJoinId] = useState('');
   const [tab, setTab]       = useState('create');
+  const [selectedAvatar, setSelectedAvatar] = useState(AVATARS[0]);
 
   // Auto-fill room ID from URL ?room=XXXXXX
   useEffect(() => {
@@ -42,6 +54,23 @@ export default function MenuScreen({ myName, onCreateRoom, onJoinRoom, joinError
           />
         </div>
 
+        <div className={styles.avatarSection}>
+          <label className={styles.avatarLabel}>Chọn Avatar của bạn</label>
+          <div className={styles.avatarGrid}>
+            {AVATARS.map((av) => (
+              <button
+                key={av.id}
+                type="button"
+                className={`${styles.avatarBtn} ${selectedAvatar.id === av.id ? styles.avatarBtnActive : ''}`}
+                style={{ '--avatar-bg': av.color }}
+                onClick={() => setSelectedAvatar(av)}
+              >
+                <span className={styles.avatarEmoji}>{av.emoji}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className={styles.tabs}>
           <button className={tab === 'create' ? styles.tabActive : styles.tab} onClick={() => setTab('create')}>🏠 Tạo phòng</button>
           <button className={tab === 'join'   ? styles.tabActive : styles.tab} onClick={() => setTab('join')}>🔗 Vào phòng</button>
@@ -50,7 +79,7 @@ export default function MenuScreen({ myName, onCreateRoom, onJoinRoom, joinError
         {tab === 'create' && (
           <div className={styles.section}>
             <p className={styles.hint}>Tạo phòng mới và chia sẻ Room ID cho bạn bè.</p>
-            <button className={styles.btnPrimary} disabled={!nameOk} onClick={() => onCreateRoom(name.trim())}>
+            <button className={styles.btnPrimary} disabled={!nameOk} onClick={() => onCreateRoom(name.trim(), selectedAvatar)}>
               Tạo phòng ngay ✨
             </button>
           </div>
@@ -66,11 +95,11 @@ export default function MenuScreen({ myName, onCreateRoom, onJoinRoom, joinError
                 placeholder="VD: AB3C7X"
                 maxLength={6}
                 style={{ letterSpacing: '5px', fontSize: '22px', textAlign: 'center', textTransform: 'uppercase' }}
-                onKeyDown={e => e.key === 'Enter' && canJoin && onJoinRoom(name.trim(), joinId)}
+                onKeyDown={e => e.key === 'Enter' && canJoin && onJoinRoom(name.trim(), joinId, selectedAvatar)}
               />
             </div>
             {joinError && <p className={styles.error}>⚠️ {joinError}</p>}
-            <button className={styles.btnPrimary} disabled={!canJoin} onClick={() => onJoinRoom(name.trim(), joinId)}>
+            <button className={styles.btnPrimary} disabled={!canJoin} onClick={() => onJoinRoom(name.trim(), joinId, selectedAvatar)}>
               Vào phòng →
             </button>
           </div>

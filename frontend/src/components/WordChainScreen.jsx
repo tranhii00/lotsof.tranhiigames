@@ -48,12 +48,12 @@ export default function WordChainScreen({
     }
   }, [submitResult]);
 
-  // Keep input focused on your turn
+  // Keep input focused on your turn or when submission finishes
   useEffect(() => {
-    if (isMyTurn && inputRef.current) {
+    if (isMyTurn && !isSubmitting && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [isMyTurn]);
+  }, [isMyTurn, isSubmitting]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -100,7 +100,9 @@ export default function WordChainScreen({
       <div className={styles.playersArea}>
         {/* Me Card */}
         <div className={`${styles.playerCard} ${isMyTurn ? styles.activeCard : ''}`}>
-          <div className={styles.avatar}>🧑‍💻</div>
+          <div className={styles.avatar} style={{ backgroundColor: me.avatar?.color || '#FF7A00' }}>
+            {me.avatar?.emoji || '🦊'}
+          </div>
           <div className={styles.name}>{me.name} (Bạn)</div>
           {renderHearts(me.id)}
           {isMyTurn && <div className={styles.turnBadge}>Đến lượt bạn!</div>}
@@ -110,7 +112,9 @@ export default function WordChainScreen({
 
         {/* Opp Card */}
         <div className={`${styles.playerCard} ${!isMyTurn ? styles.activeCard : ''}`}>
-          <div className={styles.avatar}>👤</div>
+          <div className={styles.avatar} style={{ backgroundColor: opp.avatar?.color || '#4E5D6C' }}>
+            {opp.avatar?.emoji || '🐼'}
+          </div>
           <div className={styles.name}>{opp?.name || 'Đối thủ'}</div>
           {renderHearts(opp.id)}
           {!isMyTurn && <div className={styles.turnBadge}>Đối thủ nghĩ...</div>}

@@ -80,13 +80,19 @@ export default function SentenceScrambleScreen({
 
       <div className={styles.scoreboard}>
         <div className={styles.scoreCard}>
+          <div className={styles.avatarMini} style={{ backgroundColor: me.avatar?.color || '#FF7A00' }}>
+            {me.avatar?.emoji || '🦊'}
+          </div>
           <span className={styles.playerName}>{me.name} (Bạn)</span>
           <span className={styles.scoreValue}>{myScore}</span>
         </div>
         <div className={styles.scoreDivider}>VS</div>
         <div className={styles.scoreCard}>
+          <div className={styles.avatarMini} style={{ backgroundColor: opp.avatar?.color || '#4E5D6C' }}>
+            {opp.avatar?.emoji || '🐼'}
+          </div>
+          <span className={styles.playerName}>{opp?.name || 'Đối thủ'}</span>
           <span className={styles.scoreValue}>{oppScore}</span>
-          <span className={styles.playerName}>{opp?.name}</span>
         </div>
       </div>
 

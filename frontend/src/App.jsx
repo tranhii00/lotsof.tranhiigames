@@ -6,6 +6,7 @@ import GameScreen from './components/GameScreen';
 import LobbyScreen from './components/LobbyScreen';
 import SentenceScrambleScreen from './components/SentenceScrambleScreen';
 import WordChainScreen from './components/WordChainScreen';
+import EnglishWordBuilderScreen from './components/EnglishWordBuilderScreen';
 import Modal from './components/Modal';
 import MusicPlayer from './components/MusicPlayer';
 import MatchFoundOverlay from './components/MatchFoundOverlay';
@@ -16,10 +17,10 @@ import styles from './App.module.css';
 
 export default function App() {
   const {
-    connStatus, screen, myName,
+    connStatus, screen, myName, myAvatar, setMyAvatar,
     myRole, roomId, opponentName, lobbyInfo, socketId,
     board, currentTurn, timerInfo, turnDuration,
-    ssState, wcState,
+    ssState, wcState, ewbState,
     chatMsgs, modal, joinError,
     lastMove, winningLine, rematchStatus, lobbyStatus,
     showMatchFound, rulesGameType, readyStatus, countdownNumber, showCountdown, matchmakingCountdown,
@@ -50,8 +51,14 @@ export default function App() {
       {screen === 'menu' && (
         <MenuScreen
           myName={myName}
-          onCreateRoom={actions.createRoom}
-          onJoinRoom={actions.joinRoom}
+          onCreateRoom={(name, av) => {
+            setMyAvatar(av);
+            actions.createRoom(name, av);
+          }}
+          onJoinRoom={(name, rid, av) => {
+            setMyAvatar(av);
+            actions.joinRoom(name, rid, av);
+          }}
           joinError={joinError}
         />
       )}
@@ -59,6 +66,7 @@ export default function App() {
       {screen === 'waiting' && (
         <WaitingScreen
           myName={myName}
+          myAvatar={myAvatar}
           roomId={roomId}
           onCancel={actions.cancelWait}
         />
@@ -79,6 +87,7 @@ export default function App() {
           myRole={myRole}
           myName={myName}
           opponentName={opponentName}
+          lobbyInfo={lobbyInfo}
           board={board}
           currentTurn={currentTurn}
           timerInfo={timerInfo}
@@ -114,6 +123,21 @@ export default function App() {
           onChat={actions.sendChat}
           chatMsgs={chatMsgs}
           timerInfo={timerInfo}
+        />
+      )}
+
+      {screen === 'english_word_builder' && (
+        <EnglishWordBuilderScreen
+          ewbState={ewbState}
+          lobbyInfo={lobbyInfo}
+          myRole={myRole}
+          socketId={socketId}
+          onSubmitLetter={actions.submitEwbLetter}
+          onSubmitWord={actions.submitEwbWord}
+          onSkip={actions.skipEwb}
+          onLeave={actions.leaveRoom}
+          onChat={actions.sendChat}
+          chatMsgs={chatMsgs}
         />
       )}
 

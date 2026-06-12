@@ -7,7 +7,7 @@ function genRoomId() {
   return rooms[id] ? genRoomId() : id;
 }
 
-function createRoom(socketId, playerName) {
+function createRoom(socketId, playerName, avatar = null) {
   const roomId = genRoomId();
   rooms[roomId] = {
     id: roomId,
@@ -18,7 +18,8 @@ function createRoom(socketId, playerName) {
         id: socketId,
         name: playerName,
         role: 'host',
-        score: 0
+        score: 0,
+        avatar
       } 
     },
     gameState: null,
@@ -36,14 +37,15 @@ function deleteRoom(roomId) {
   }
 }
 
-function addPlayer(roomId, socketId, playerName) {
+function addPlayer(roomId, socketId, playerName, avatar = null) {
   const room = rooms[roomId];
   if (!room) return false;
   room.players[socketId] = { 
     id: socketId,
     name: playerName,
     role: 'guest',
-    score: 0 
+    score: 0,
+    avatar
   };
   room.status = 'lobby'; // Move to lobby when 2 players join
   return true;

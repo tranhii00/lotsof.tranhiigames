@@ -26,6 +26,15 @@ const RULES = {
       'Độ dài từ bắt buộc từ 3 chữ cái trở lên.',
       'Thời gian nghĩ là 10 giây. Nhập sai từ hoặc hết giờ sẽ bị trừ 1 HP (mỗi người có 3 HP).'
     ]
+  },
+  english_word_builder: {
+    title: 'MAKE A WORD',
+    badge: 'TẠO TỪ TIẾNG ANH',
+    items: [
+      'Hai người lần lượt chọn chữ cái đầu và cuối của từ.',
+      'Gõ từ tiếng Anh khớp với 2 chữ cái đó; ai đúng trước được +1đ - đủ 10đ trước sẽ thắng.',
+      'Khi bạn Skip, đối phương có 15s để tiếp tục - 5s đầu có thể Skip để hòa và qua vòng mới; 10s sau bắt buộc nhập từ. Nhập đúng +1đ, sai thì điểm cho đối phương.'
+    ]
   }
 };
 

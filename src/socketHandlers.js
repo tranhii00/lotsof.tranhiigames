@@ -9,6 +9,110 @@ function sysMsg(text) {
   return { system: true, message: text, time: new Date().toLocaleTimeString('vi-VN', { hour:'2-digit', minute:'2-digit' }) };
 }
 
+function cleanupRoomTimers(room) {
+  if (room) {
+    if (room.timer) {
+      clearTimeout(room.timer);
+      room.timer = null;
+    }
+    if (room.gameState && room.gameState.skipTimer) {
+      clearInterval(room.gameState.skipTimer);
+      room.gameState.skipTimer = null;
+    }
+  }
+}
+
+function createEwbScores(players) {
+  return Object.keys(players).reduce((acc, id) => {
+    acc[id] = 0;
+    return acc;
+  }, {});
+}
+
+function startEwbRound(io, room) {
+  const rid = room.id;
+  const gs = room.gameState;
+  if (!gs) return;
+
+  gs.round += 1;
+  gs.phase = 'setting';
+  gs.firstLetter = null;
+  gs.lastLetter = null;
+  gs.lettersSubmitted = {};
+  gs.skippedFirstPlayerId = null;
+
+  cleanupRoomTimers(room);
+
+  const hostId = Object.keys(room.players).find(id => room.players[id].role === 'host');
+  const guestId = Object.keys(room.players).find(id => room.players[id].role === 'guest');
+
+  // Alternating rules: every 3 rounds
+  const isHostFirst = Math.floor((gs.round - 1) / 3) % 2 === 0;
+
+  const firstLetterPlayerId = isHostFirst ? hostId : guestId;
+  const lastLetterPlayerId = isHostFirst ? guestId : hostId;
+
+  gs.firstLetterPlayerId = firstLetterPlayerId;
+  gs.lastLetterPlayerId = lastLetterPlayerId;
+
+  io.to(rid).emit(EVENTS.EWB_ROUND_STARTED, {
+    round: gs.round,
+    firstLetterPlayerId,
+    lastLetterPlayerId,
+    scores: gs.scores
+  });
+
+  const firstPlayerName = room.players[firstLetterPlayerId].name;
+  const lastPlayerName = room.players[lastLetterPlayerId].name;
+  // io.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg(`🔤 Round ${gs.round}: ${firstPlayerName} sets first letter, ${lastPlayerName} sets last letter.`));
+}
+
+function endEwbRound(io, room, winnerId, reason, correctWord = null) {
+  const rid = room.id;
+  const gs = room.gameState;
+  if (!gs) return;
+
+  cleanupRoomTimers(room);
+
+  if (winnerId) {
+    gs.scores[winnerId] = (gs.scores[winnerId] || 0) + 1;
+  }
+
+  io.to(rid).emit(EVENTS.EWB_ROUND_END, {
+    winnerId,
+    reason,
+    scores: gs.scores,
+    firstLetter: gs.firstLetter,
+    lastLetter: gs.lastLetter,
+    correctWord
+  });
+
+  const hostId = Object.keys(room.players).find(id => room.players[id].role === 'host');
+  const guestId = Object.keys(room.players).find(id => room.players[id].role === 'guest');
+
+  const hostScore = gs.scores[hostId] || 0;
+  const guestScore = gs.scores[guestId] || 0;
+
+  if (hostScore >= 10 || guestScore >= 10) {
+    const finalWinnerId = hostScore >= 10 ? hostId : guestId;
+    
+    room.status = 'finished';
+    io.to(rid).emit(EVENTS.EWB_GAME_OVER, {
+      winnerId: finalWinnerId,
+      winnerName: room.players[finalWinnerId].name,
+      scores: gs.scores
+    });
+    // io.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg(`🏆 ${room.players[finalWinnerId].name} đã chiến thắng chung cuộc!`));
+  } else {
+    // Start new round after 1.5 seconds
+    room.timer = setTimeout(() => {
+      const r = getRoom(rid);
+      if (!r || r.status !== 'playing' || r.selectedGame !== GAME_TYPES.ENGLISH_WORD_BUILDER) return;
+      startEwbRound(io, r);
+    }, 1500);
+  }
+}
+
 function createSentenceScores(players) {
   return Object.keys(players).reduce((acc, id) => {
     acc[id] = 0;
@@ -202,6 +306,25 @@ function initializeGame(io, room, playerIds) {
     io.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg(`🗣️ Bắt đầu Nối Từ Tiếng Anh! Lượt đầu thuộc về ${room.players[hostId].name}. Chữ cái cần nối: "${starterWord.slice(-1).toUpperCase()}".`));
 
     startWordChainRound(io, rid);
+  } else if (gameType === GAME_TYPES.ENGLISH_WORD_BUILDER) {
+    room.gameState = {
+      targetScore: 10,
+      scores: createEwbScores(room.players),
+      round: 0,
+      phase: 'setting', // 'setting' or 'solving'
+      firstLetter: null,
+      lastLetter: null,
+      lettersSubmitted: {},
+      rematchRequests: {},
+      lobbyRequests: {},
+      skipTimer: null,
+      skippedFirstPlayerId: null
+    };
+
+    io.to(rid).emit(EVENTS.GAME_STARTED, { gameType });
+    io.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg(`🔤 Bắt đầu Tạo Từ Tiếng Anh (Make a Word)! Ai đạt 10 điểm trước sẽ thắng.`));
+
+    startEwbRound(io, room);
   }
 }
 
@@ -216,7 +339,7 @@ module.exports = function registerHandlers(io) {
       if (!v.ok) return socket.emit(EVENTS.JOIN_ERROR, v.error);
 
       const name = payload.playerName.trim();
-      const room = require('./rooms').createRoom(socket.id, name);
+      const room = require('./rooms').createRoom(socket.id, name, payload.avatar);
 
       socket.join(room.id);
       socket.roomId = room.id;
@@ -237,7 +360,7 @@ module.exports = function registerHandlers(io) {
       if (!room) return socket.emit(EVENTS.JOIN_ERROR, 'Phòng không tồn tại!');
       if (room.status !== 'waiting') return socket.emit(EVENTS.JOIN_ERROR, 'Phòng đã đầy hoặc đang chơi!');
 
-      require('./rooms').addPlayer(rid, socket.id, name);
+      require('./rooms').addPlayer(rid, socket.id, name, payload.avatar);
       socket.join(rid);
       socket.roomId = rid;
       socket.playerName = name;
@@ -255,7 +378,7 @@ module.exports = function registerHandlers(io) {
       console.log('[LOBBY]', rid, 'ready');
     });
 
-    // ── SELECT GAME (Host only) ───────────────────────────────
+    // ── SELECT GAME (Any player can choose) ────────────────────
     socket.on(EVENTS.SELECT_GAME, ({ gameType }) => {
       console.log(`[SELECT_GAME] Request from ${socket.id} for game: ${gameType}`);
       const rid = socket.roomId;
@@ -272,10 +395,6 @@ module.exports = function registerHandlers(io) {
       const player = room.players[socket.id];
       if (!player) {
         console.log(`[SELECT_GAME] Failed: Player not found in room`);
-        return;
-      }
-      if (player.role !== 'host') {
-        console.log(`[SELECT_GAME] Failed: Player is not host. Role: ${player.role}`);
         return;
       }
 
@@ -476,6 +595,152 @@ module.exports = function registerHandlers(io) {
       startWordChainRound(io, rid);
     });
 
+    // ── ENGLISH WORD BUILDER: SUBMIT LETTER ─────────────────────
+    socket.on(EVENTS.EWB_SUBMIT_LETTER, ({ letter }) => {
+      const rid = socket.roomId;
+      const room = rid && getRoom(rid);
+      if (!room || room.status !== 'playing' || room.selectedGame !== GAME_TYPES.ENGLISH_WORD_BUILDER) return;
+
+      const gs = room.gameState;
+      if (!gs || gs.phase !== 'setting') return;
+
+      const isFirst = socket.id === gs.firstLetterPlayerId;
+      const isLast = socket.id === gs.lastLetterPlayerId;
+      if (!isFirst && !isLast) return;
+
+      const cleanLetter = String(letter).trim().toLowerCase();
+      if (!/^[a-z]$/.test(cleanLetter)) return;
+
+      if (isFirst) {
+        gs.firstLetter = cleanLetter;
+        gs.lettersSubmitted[socket.id] = true;
+      } else {
+        gs.lastLetter = cleanLetter;
+        gs.lettersSubmitted[socket.id] = true;
+      }
+
+      io.to(rid).emit(EVENTS.EWB_LETTER_SUBMITTED, { playerId: socket.id });
+
+      if (gs.firstLetter && gs.lastLetter) {
+        gs.phase = 'solving';
+        io.to(rid).emit(EVENTS.EWB_SOLVING_START, {
+          firstLetter: gs.firstLetter,
+          lastLetter: gs.lastLetter
+        });
+        // io.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg(`🚀 Letters revealed: [ ${gs.firstLetter.toUpperCase()} ... ${gs.lastLetter.toUpperCase()} ]. Quick! Type a word starting with "${gs.firstLetter.toUpperCase()}" and ending with "${gs.lastLetter.toUpperCase()}"!`));
+
+        cleanupRoomTimers(room);
+        // No timeout when both players are actively solving, players must skip if stuck.
+      }
+    });
+
+    // ── ENGLISH WORD BUILDER: SUBMIT WORD ───────────────────────
+    socket.on(EVENTS.EWB_SUBMIT_WORD, async ({ word }) => {
+      const rid = socket.roomId;
+      const room = rid && getRoom(rid);
+      if (!room || room.status !== 'playing' || room.selectedGame !== GAME_TYPES.ENGLISH_WORD_BUILDER) return;
+
+      const gs = room.gameState;
+      if (!gs || gs.phase !== 'solving') return;
+
+      const rawWord = String(word).trim().toLowerCase();
+
+      if (gs.skippedFirstPlayerId === socket.id) {
+        socket.emit(EVENTS.EWB_WORD_RESULT, { correct: false, reason: 'You have skipped and cannot submit a word!' });
+        return;
+      }
+
+      if (rawWord.charAt(0) !== gs.firstLetter || rawWord.charAt(rawWord.length - 1) !== gs.lastLetter) {
+        socket.emit(EVENTS.EWB_WORD_RESULT, { correct: false, reason: `Word must start with "${gs.firstLetter.toUpperCase()}" and end with "${gs.lastLetter.toUpperCase()}"!` });
+        if (gs.skippedFirstPlayerId) {
+          // Wrong attempt after opponent skipped -> skipper wins immediately!
+          const skipperId = gs.skippedFirstPlayerId;
+          endEwbRound(io, room, skipperId, 'opponent_invalid_word');
+        }
+        return;
+      }
+
+      const valid = await isValidWord(rawWord);
+      if (!valid) {
+        socket.emit(EVENTS.EWB_WORD_RESULT, { correct: false, reason: `"${rawWord.toUpperCase()}" is not a valid English word!` });
+        if (gs.skippedFirstPlayerId) {
+          // Wrong attempt after opponent skipped -> skipper wins immediately!
+          const skipperId = gs.skippedFirstPlayerId;
+          endEwbRound(io, room, skipperId, 'opponent_invalid_word');
+        }
+        return;
+      }
+
+      socket.emit(EVENTS.EWB_WORD_RESULT, { correct: true });
+
+      // io.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg(`✨ ${room.players[socket.id].name} submitted "${rawWord.toUpperCase()}" (+1 point)!`));
+      endEwbRound(io, room, socket.id, 'correct_word', rawWord);
+    });
+
+    // ── ENGLISH WORD BUILDER: SKIP ──────────────────────────────
+    socket.on(EVENTS.EWB_SKIP, () => {
+      const rid = socket.roomId;
+      const room = rid && getRoom(rid);
+      if (!room || room.status !== 'playing' || room.selectedGame !== GAME_TYPES.ENGLISH_WORD_BUILDER) return;
+
+      const gs = room.gameState;
+      if (!gs || gs.phase !== 'solving') return;
+
+      if (gs.skippedFirstPlayerId === socket.id) return;
+
+      const playerIds = Object.keys(room.players);
+      const opponentId = playerIds.find(id => id !== socket.id);
+
+      if (!gs.skippedFirstPlayerId) {
+        gs.skippedFirstPlayerId = socket.id;
+        gs.skipTimerStart = Date.now();
+        gs.skipDuration = 15000; // 15 seconds remaining for opponent
+
+        cleanupRoomTimers(room);
+
+        io.to(rid).emit(EVENTS.EWB_SKIP_UPDATE, {
+          skippedFirstPlayerId: gs.skippedFirstPlayerId,
+          timeLeftMs: 15000,
+          canOpponentSkip: true
+        });
+
+        if (gs.skipTimer) clearInterval(gs.skipTimer);
+        gs.skipTimer = setInterval(() => {
+          const r = getRoom(rid);
+          if (!r || r.status !== 'playing' || r.selectedGame !== GAME_TYPES.ENGLISH_WORD_BUILDER) {
+            clearInterval(gs.skipTimer);
+            return;
+          }
+          const elapsed = Date.now() - r.gameState.skipTimerStart;
+          const timeLeft = Math.max(0, r.gameState.skipDuration - elapsed);
+          const canOpponentSkip = timeLeft >= 10000; // First 5 seconds (15s to 10s remaining)
+
+          io.to(rid).emit(EVENTS.EWB_SKIP_UPDATE, {
+            skippedFirstPlayerId: r.gameState.skippedFirstPlayerId,
+            timeLeftMs: timeLeft,
+            canOpponentSkip
+          });
+
+          if (timeLeft <= 0) {
+            clearInterval(r.gameState.skipTimer);
+            r.gameState.skipTimer = null;
+            // Time's up! Skipper gets 1 point
+            endEwbRound(io, r, socket.id, 'opponent_timeout');
+          }
+        }, 1000);
+
+      } else {
+        const elapsed = Date.now() - gs.skipTimerStart;
+        if (elapsed <= 5000) { // Can cancel within the first 5 seconds
+          if (gs.skipTimer) {
+            clearInterval(gs.skipTimer);
+            gs.skipTimer = null;
+          }
+          endEwbRound(io, room, null, 'both_skip');
+        }
+      }
+    });
+
     // ── REQUEST REMATCH ────────────────────────────────────────
     socket.on(EVENTS.REQUEST_REMATCH, () => {
       const rid = socket.roomId;
@@ -563,7 +828,7 @@ module.exports = function registerHandlers(io) {
       const rid = socket.roomId;
       const room = rid && getRoom(rid);
       if (room) {
-        clearTimeout(room.timer);
+        cleanupRoomTimers(room);
         socket.to(rid).emit(EVENTS.OPPONENT_DISCONNECTED);
         socket.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg('🔌 Đối thủ đã rời phòng.'));
         deleteRoom(rid);
@@ -576,7 +841,7 @@ module.exports = function registerHandlers(io) {
       const rid = socket.roomId;
       const room = rid && getRoom(rid);
       if (room) {
-        clearTimeout(room.timer);
+        cleanupRoomTimers(room);
         deleteRoom(rid);
       }
       socket.roomId = null;
@@ -587,7 +852,7 @@ module.exports = function registerHandlers(io) {
       const rid = socket.roomId;
       const room = rid && getRoom(rid);
       if (room) {
-        clearTimeout(room.timer);
+        cleanupRoomTimers(room);
         socket.to(rid).emit(EVENTS.OPPONENT_DISCONNECTED);
         socket.to(rid).emit(EVENTS.SYSTEM_MSG, sysMsg('🔌 Đối thủ mất kết nối.'));
         deleteRoom(rid);

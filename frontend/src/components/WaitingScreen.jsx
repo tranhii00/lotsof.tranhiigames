@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styles from './WaitingScreen.module.css';
 
-export default function WaitingScreen({ myName, roomId, onCancel }) {
+export default function WaitingScreen({ myName, myAvatar, roomId, onCancel }) {
   const [copied, setCopied] = useState(false);
 
   // Generate shareable link with ?room=ROOMID
@@ -26,7 +26,10 @@ export default function WaitingScreen({ myName, roomId, onCancel }) {
       <div className={styles.card}>
         <div className={styles.ring} />
         <h2>Đang chờ đối thủ...</h2>
-        <p className={styles.name}>👤 {myName}</p>
+        <div className={styles.playerAvatar} style={{ backgroundColor: myAvatar?.color || '#FF7A00' }}>
+          <span className={styles.playerEmoji}>{myAvatar?.emoji || '🦊'}</span>
+        </div>
+        <p className={styles.name}>{myName}</p>
 
         <div className={styles.roomBox}>
           <span className={styles.roomLabel}>Room ID của bạn</span>

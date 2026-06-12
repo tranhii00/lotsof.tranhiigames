@@ -5,7 +5,7 @@ import ChatPanel from './ChatPanel';
 import styles from './GameScreen.module.css';
 
 export default function GameScreen({
-  myRole, myName, opponentName,
+  myRole, myName, opponentName, lobbyInfo,
   board, currentTurn, timerInfo, turnDuration,
   chatMsgs, lastMove, winningLine,
   onMove, onChat, onLeave,
@@ -16,12 +16,19 @@ export default function GameScreen({
   const isMyTurn = currentTurn === myRole;
   const gameOver = Boolean(winningLine);
 
+  const players = lobbyInfo ? Object.values(lobbyInfo.players) : [];
+  const hostPlayer = players.find(p => p.role === 'host') || {};
+  const guestPlayer = players.find(p => p.role === 'guest') || {};
+
   return (
     <div className={styles.layout}>
 
       {/* ── TOP BAR (status + timer + player info) ── */}
       <div className={styles.topBar}>
         <div className={`${styles.playerChip} ${currentTurn === 'X' ? styles.activeX : ''}`}>
+          <div className={styles.avatarMini} style={{ backgroundColor: hostPlayer.avatar?.color || '#FF7A00' }}>
+            {hostPlayer.avatar?.emoji || '🦊'}
+          </div>
           <span className={styles.symX}>✕</span>
           <span>{xName}{myRole === 'X' ? ' (bạn)' : ''}</span>
         </div>
@@ -36,6 +43,9 @@ export default function GameScreen({
         <div className={`${styles.playerChip} ${currentTurn === 'O' ? styles.activeO : ''}`}>
           <span>{oName}{myRole === 'O' ? ' (bạn)' : ''}</span>
           <span className={styles.symO}>○</span>
+          <div className={styles.avatarMini} style={{ backgroundColor: guestPlayer.avatar?.color || '#4E5D6C' }}>
+            {guestPlayer.avatar?.emoji || '🐼'}
+          </div>
         </div>
       </div>
 

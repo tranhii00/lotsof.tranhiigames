@@ -44,3 +44,46 @@
 .btnPrimary:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
 .btnPrimary:disabled { opacity: 0.4; cursor: not-allowed; }
 .error { color: var(--red); font-size: 13px; font-weight: 600; }
+
+.avatarSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.avatarLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.avatarGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.avatarBtn {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  background: var(--avatar-bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s, box-shadow 0.2s;
+  padding: 0;
+}
+.avatarBtn:hover {
+  transform: scale(1.1);
+}
+.avatarBtnActive {
+  border-color: #fff;
+  box-shadow: 0 0 16px var(--avatar-bg);
+  transform: scale(1.15) !important;
+}
+.avatarEmoji {
+  font-size: 24px;
+  line-height: 1;
+}

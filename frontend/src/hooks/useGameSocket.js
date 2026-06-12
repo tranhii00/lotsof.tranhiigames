@@ -8,7 +8,18 @@ const mkBoard = () => Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).f
 export function useGameSocket() {
   const [connStatus, setConnStatus] = useState('connecting');
   const [screen, setScreen]         = useState('menu'); // menu, waiting, lobby, caro, sentence_scramble
-  const [myName, setMyName]         = useState(() => localStorage.getItem('caroName') || '');
+  const [myName, setMyName]         = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('room')) return '';
+    return localStorage.getItem('caroName') || '';
+  });
+  const [myAvatar, setMyAvatar]     = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('caroAvatar')) || { id: 'fox', emoji: '🦊', color: '#FF7A00' };
+    } catch {
+      return { id: 'fox', emoji: '🦊', color: '#FF7A00' };
+    }
+  });
   const [myRole, setMyRole]         = useState(null);
   const [roomId, setRoomId]         = useState('');
   const [opponentName, setOpponentName] = useState('');
@@ -26,6 +37,21 @@ export function useGameSocket() {
 
   // Word Chain state
   const [wcState, setWcState] = useState({ activePlayerId: '', currentWord: '', requiredLetter: '', hp: {}, wordList: [], submitResult: null });
+
+  // English Word Builder state
+  const [ewbState, setEwbState] = useState({
+    round: 1,
+    phase: 'setting',
+    firstLetterPlayerId: '',
+    lastLetterPlayerId: '',
+    firstLetter: '',
+    lastLetter: '',
+    lettersSubmitted: {},
+    scores: {},
+    submitResult: null,
+    skipState: null,
+    roundEndResult: null
+  });
 
   // Shared state
   const [chatMsgs, setChatMsgs]     = useState([]);
@@ -49,6 +75,7 @@ export function useGameSocket() {
   lobbyInfoRef.current = lobbyInfo;
 
   useEffect(() => { localStorage.setItem('caroName', myName); }, [myName]);
+  useEffect(() => { localStorage.setItem('caroAvatar', JSON.stringify(myAvatar)); }, [myAvatar]);
 
   const resetGame = useCallback(() => {
     setBoard(mkBoard());
@@ -66,6 +93,7 @@ export function useGameSocket() {
     setLobbyStatus(null);
     setSsState({ round: 1, words: [], scores: {}, submitResult: null, lastWinner: null, lastAnswer: null });
     setWcState({ activePlayerId: '', currentWord: '', requiredLetter: '', hp: {}, wordList: [], submitResult: null });
+    setEwbState({ round: 1, phase: 'setting', firstLetterPlayerId: '', lastLetterPlayerId: '', firstLetter: '', lastLetter: '', lettersSubmitted: {}, scores: {}, submitResult: null, skipState: null, roundEndResult: null });
     setShowMatchFound(false);
     setRulesGameType(null);
     setReadyStatus({});
@@ -194,6 +222,9 @@ export function useGameSocket() {
       } else if (payload.gameType === GAME_TYPES.WORD_CHAIN) {
         setWcState({ activePlayerId: '', currentWord: '', requiredLetter: '', hp: {}, wordList: [], submitResult: null });
         setScreen('word_chain');
+      } else if (payload.gameType === GAME_TYPES.ENGLISH_WORD_BUILDER) {
+        setEwbState({ round: 1, phase: 'setting', firstLetterPlayerId: '', lastLetterPlayerId: '', firstLetter: '', lastLetter: '', lettersSubmitted: {}, scores: {}, submitResult: null, skipState: null });
+        setScreen('english_word_builder');
       }
     });
 
@@ -314,6 +345,87 @@ export function useGameSocket() {
       });
     });
 
+    // ENGLISH WORD BUILDER EVENTS
+    socket.on(EVENTS.EWB_ROUND_STARTED, ({ round, firstLetterPlayerId, lastLetterPlayerId, scores }) => {
+      setEwbState({
+        round,
+        phase: 'setting',
+        firstLetterPlayerId,
+        lastLetterPlayerId,
+        firstLetter: '',
+        lastLetter: '',
+        lettersSubmitted: {},
+        scores,
+        submitResult: null,
+        skipState: null,
+        roundEndResult: null
+      });
+    });
+
+    socket.on(EVENTS.EWB_LETTER_SUBMITTED, ({ playerId }) => {
+      setEwbState(prev => ({
+        ...prev,
+        lettersSubmitted: {
+          ...prev.lettersSubmitted,
+          [playerId]: true
+        }
+      }));
+    });
+
+    socket.on(EVENTS.EWB_SOLVING_START, ({ firstLetter, lastLetter }) => {
+      setEwbState(prev => ({
+        ...prev,
+        phase: 'solving',
+        firstLetter,
+        lastLetter
+      }));
+    });
+
+    socket.on(EVENTS.EWB_WORD_RESULT, ({ correct, reason }) => {
+      setEwbState(prev => ({
+        ...prev,
+        submitResult: { correct, reason }
+      }));
+      if (correct) sfx.playWin();
+      else sfx.playBuzzer();
+    });
+
+    socket.on(EVENTS.EWB_SKIP_UPDATE, ({ skippedFirstPlayerId, timeLeftMs, canOpponentSkip }) => {
+      setEwbState(prev => ({
+        ...prev,
+        skipState: { skippedFirstPlayerId, timeLeftMs, canOpponentSkip }
+      }));
+    });
+
+    socket.on(EVENTS.EWB_ROUND_END, ({ winnerId, reason, scores, firstLetter, lastLetter, correctWord }) => {
+      setEwbState(prev => ({
+        ...prev,
+        scores,
+        firstLetter,
+        lastLetter,
+        phase: 'solving', // Keep it revealed
+        roundEndResult: { winnerId, reason, correctWord }
+      }));
+      if (winnerId === mySocketIdRef.current) sfx.playWin();
+      else if (winnerId) sfx.playLose();
+      else sfx.playBuzzer();
+    });
+
+    socket.on(EVENTS.EWB_GAME_OVER, ({ winnerId, winnerName }) => {
+      const isWin = winnerId === mySocketIdRef.current;
+      const isDraw = winnerId === null;
+
+      if (isWin) sfx.playWin();
+      else if (!isDraw) sfx.playLose();
+
+      setModal({
+        emoji: isWin ? '🏆' : isDraw ? '🤝' : '😔',
+        title: isWin ? 'Chiến thắng!' : isDraw ? 'Hòa!' : 'Thất bại',
+        msg: isWin ? 'Chúc mừng! Bạn đã thắng cuộc!' : isDraw ? 'Trận đấu hòa!' : `Rất tiếc! ${winnerName} đã thắng cuộc.`,
+        type: isWin ? 'win' : isDraw ? 'draw' : 'lose'
+      });
+    });
+
     // SHARED EVENTS
     socket.on(EVENTS.REMATCH_UPDATE, ({ msg, requested }) => {
       setRematchStatus({ requested, msg });
@@ -358,16 +470,16 @@ export function useGameSocket() {
     return name;
   }, []);
 
-  const createRoom = useCallback((name) => {
+  const createRoom = useCallback((name, avatar) => {
     const n = saveName(name);
     setJoinError('');
-    socket.emit(EVENTS.CREATE_ROOM, { playerName: n });
+    socket.emit(EVENTS.CREATE_ROOM, { playerName: n, avatar });
   }, [saveName]);
 
-  const joinRoom = useCallback((name, rid) => {
+  const joinRoom = useCallback((name, rid, avatar) => {
     const n = saveName(name);
     setJoinError('');
-    socket.emit(EVENTS.JOIN_ROOM, { playerName: n, roomId: rid });
+    socket.emit(EVENTS.JOIN_ROOM, { playerName: n, roomId: rid, avatar });
   }, [saveName]);
 
   const selectGame = useCallback((gameType) => {
@@ -379,7 +491,21 @@ export function useGameSocket() {
   }, []);
 
   const submitWord = useCallback((word) => {
+    setWcState(prev => ({ ...prev, submitResult: null }));
     socket.emit(EVENTS.WORD_SUBMIT_ANSWER, { word });
+  }, []);
+
+  const submitEwbLetter = useCallback((letter) => {
+    socket.emit(EVENTS.EWB_SUBMIT_LETTER, { letter });
+  }, []);
+
+  const submitEwbWord = useCallback((word) => {
+    setEwbState(prev => ({ ...prev, submitResult: null }));
+    socket.emit(EVENTS.EWB_SUBMIT_WORD, { word });
+  }, []);
+
+  const skipEwb = useCallback(() => {
+    socket.emit(EVENTS.EWB_SKIP);
   }, []);
 
   const cancelWait = useCallback(() => {
@@ -425,13 +551,13 @@ export function useGameSocket() {
   }, [screen, resetGame]);
 
   return {
-    connStatus, screen, myName, setMyName,
+    connStatus, screen, myName, setMyName, myAvatar, setMyAvatar,
     myRole, roomId, opponentName, lobbyInfo, socketId: mySocketIdRef.current,
     board, currentTurn, timerInfo,
-    ssState, wcState,
+    ssState, wcState, ewbState,
     chatMsgs, modal, joinError,
     lastMove, winningLine, rematchStatus, lobbyStatus,
     showMatchFound, rulesGameType, readyStatus, countdownNumber, showCountdown, matchmakingCountdown,
-    actions: { createRoom, joinRoom, selectGame, submitSentence, submitWord, cancelWait, makeMove, sendChat, requestRematch, requestLobby, leaveRoom, closeModal, playerReady },
+    actions: { createRoom, joinRoom, selectGame, submitSentence, submitWord, submitEwbLetter, submitEwbWord, skipEwb, cancelWait, makeMove, sendChat, requestRematch, requestLobby, leaveRoom, closeModal, playerReady },
   };
 }

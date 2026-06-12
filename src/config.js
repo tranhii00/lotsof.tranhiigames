@@ -5,7 +5,8 @@ const TURN_MS = 30_000;
 const GAME_TYPES = {
   CARO: 'caro',
   SENTENCE_SCRAMBLE: 'sentence_scramble',
-  WORD_CHAIN: 'word_chain'
+  WORD_CHAIN: 'word_chain',
+  ENGLISH_WORD_BUILDER: 'english_word_builder'
 };
 
 const EVENTS = {
@@ -29,6 +30,11 @@ const EVENTS = {
 
   // Word Chain Events (Client → Server)
   WORD_SUBMIT_ANSWER: 'word_submit_answer',
+
+  // English Word Builder Events (Client → Server)
+  EWB_SUBMIT_LETTER: 'ewb_submit_letter',
+  EWB_SUBMIT_WORD: 'ewb_submit_word',
+  EWB_SKIP: 'ewb_skip',
 
   // Server → Client
   ROOM_CREATED:           'room_created',
@@ -62,6 +68,15 @@ const EVENTS = {
   WORD_HP_UPDATE:         'word_hp_update',
   WORD_VALIDATION_RESULT: 'word_validation_result',
   WORD_GAME_OVER:         'word_game_over',
+
+  // English Word Builder Events (Server → Client)
+  EWB_ROUND_STARTED:      'ewb_round_started',
+  EWB_LETTER_SUBMITTED:   'ewb_letter_submitted',
+  EWB_SOLVING_START:      'ewb_solving_start',
+  EWB_WORD_RESULT:        'ewb_word_result',
+  EWB_SKIP_UPDATE:        'ewb_skip_update',
+  EWB_ROUND_END:          'ewb_round_end',
+  EWB_GAME_OVER:          'ewb_game_over',
 };
 
 module.exports = { BOARD_SIZE, TURN_MS, GAME_TYPES, EVENTS };
