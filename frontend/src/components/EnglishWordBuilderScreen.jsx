@@ -230,10 +230,10 @@ export default function EnglishWordBuilderScreen({
               className={styles.wordRevealBox}
               style={roundEndResult?.correctWord ? (() => {
                 const len = roundEndResult.correctWord.length;
-                if (len <= 5) return { fontSize: '3rem', gap: '1.5rem' };
-                if (len <= 7) return { fontSize: '2.4rem', gap: '1rem' };
-                if (len <= 10) return { fontSize: '1.8rem', gap: '0.5rem' };
-                return { fontSize: '1.3rem', gap: '0.25rem' };
+                if (len <= 5) return { '--word-font-size': '3rem', '--word-gap': '1.5rem' };
+                if (len <= 7) return { '--word-font-size': '2.4rem', '--word-gap': '1rem' };
+                if (len <= 10) return { '--word-font-size': '1.8rem', '--word-gap': '0.5rem' };
+                return { '--word-font-size': '1.3rem', '--word-gap': '0.25rem' };
               })() : {}}
             >
               {roundEndResult?.correctWord ? (
