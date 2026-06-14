@@ -404,6 +404,7 @@ export function useGameSocket() {
         firstLetter,
         lastLetter,
         phase: 'solving', // Keep it revealed
+        skipState: null, // Reset skip state so UI clears immediately
         roundEndResult: { winnerId, reason, correctWord }
       }));
       if (winnerId === mySocketIdRef.current) sfx.playWin();

@@ -36,21 +36,33 @@ export default function LobbyScreen({ roomId, lobbyInfo, myRole, onSelectGame, o
         </div>
 
         <div className={styles.gameSelection}>
-          <h3>Chọn Game để bắt đầu</h3>
+          <h3>Chọn Game để bắt đầu 🎮</h3>
           <div className={styles.gameList}>
-            <div className={styles.gameCard} onClick={() => onSelectGame(GAME_TYPES.CARO)}>
+            <div 
+              className={styles.gameCard} 
+              onClick={() => onSelectGame(GAME_TYPES.CARO)}
+            >
               <div className={styles.gameIcon}>❌⭕</div>
               <div className={styles.gameName}>Cờ Caro</div>
             </div>
-            <div className={styles.gameCard} onClick={() => onSelectGame(GAME_TYPES.SENTENCE_SCRAMBLE)}>
+            <div 
+              className={styles.gameCard} 
+              onClick={() => onSelectGame(GAME_TYPES.SENTENCE_SCRAMBLE)}
+            >
               <div className={styles.gameIcon}>🧩🔤</div>
               <div className={styles.gameName}>Đua Xếp Câu</div>
             </div>
-            <div className={styles.gameCard} onClick={() => onSelectGame(GAME_TYPES.WORD_CHAIN)}>
+            <div 
+              className={styles.gameCard} 
+              onClick={() => onSelectGame(GAME_TYPES.WORD_CHAIN)}
+            >
               <div className={styles.gameIcon}>🗣️🔗</div>
               <div className={styles.gameName}>Nối Từ Tiếng Anh</div>
             </div>
-            <div className={styles.gameCard} onClick={() => onSelectGame(GAME_TYPES.ENGLISH_WORD_BUILDER)}>
+            <div 
+              className={styles.gameCard} 
+              onClick={() => onSelectGame(GAME_TYPES.ENGLISH_WORD_BUILDER)}
+            >
               <div className={styles.gameIcon}>🔤🛠️</div>
               <div className={styles.gameName}>Tạo Từ Tiếng Anh</div>
             </div>

@@ -1,54 +1,201 @@
 .page {
-  min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+              radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.12) 0%, transparent 40%),
+              radial-gradient(circle at 50% 50%, rgba(224, 64, 251, 0.08) 0%, transparent 50%),
+              #070a19;
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  -webkit-font-smoothing: antialiased;
 }
-.card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
-  padding: 40px 32px; width: 100%; max-width: 400px;
-  display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center;
-}
-.ring {
-  width: 64px; height: 64px; border-radius: 50%;
-  border: 3px solid var(--green);
-  animation: pulse 1.4s ease-in-out infinite;
-}
-@keyframes pulse { 0%{transform:scale(0.9);opacity:1} 70%{transform:scale(1.5);opacity:0} 100%{transform:scale(0.9);opacity:0} }
-.card h2 { font-size: 22px; font-weight: 800; }
-.name { color: var(--green); font-weight: 700; font-size: 16px; }
-.roomBox {
-  background: var(--surface2); border: 1px dashed var(--green); border-radius: 14px;
-  padding: 18px 20px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px;
-}
-.roomLabel { font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-.roomId { font-size: 36px; font-weight: 800; letter-spacing: 8px; color: var(--green); font-family: monospace; }
-.btnRow { display: flex; gap: 8px; }
-.copyBtn {
-  background: var(--green); color: #fff; padding: 7px 16px;
-  border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;
-}
-.copyBtn:hover { filter: brightness(1.1); }
-.hint { font-size: 13px; color: var(--dim); line-height: 1.6; }
-.btnDanger {
-  background: var(--red); color: #fff; border: none;
-  padding: 11px 28px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;
-}
-.btnDanger:hover { filter: brightness(1.1); }
 
-.playerAvatar {
+.card {
+  background: rgba(15, 20, 42, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: 40px 32px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+  box-shadow: 
+    0 10px 25px -5px rgba(0, 0, 0, 0.3),
+    0 20px 50px -15px rgba(0, 0, 0, 0.5),
+    0 1px 0px 0px rgba(255, 255, 255, 0.1) inset;
+}
+
+.ring {
   width: 70px;
   height: 70px;
+  border-radius: 50%;
+  border: 3px solid var(--green);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+  animation: pulse 1.6s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+  }
+  70% {
+    transform: scale(1.4);
+    opacity: 0;
+    box-shadow: 0 0 0 15px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.85);
+    opacity: 0;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+.card h2 {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.name {
+  color: var(--green);
+  font-weight: 800;
+  font-size: 17px;
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+}
+
+.roomBox {
+  background: rgba(12, 15, 29, 0.7);
+  border: 1px dashed rgba(16, 185, 129, 0.4);
+  border-radius: var(--radius);
+  padding: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.roomLabel {
+  font-size: 11px;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 800;
+}
+
+.roomId {
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: 6px;
+  color: var(--green);
+  font-family: 'JetBrains Mono', monospace;
+  text-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+  padding-left: 6px; /* Offset the letter-spacing on the last character */
+}
+
+.btnRow {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.copyBtn {
+  flex: 1;
+  background: rgba(16, 185, 129, 0.12);
+  color: #a7f3d0;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.copyBtn:hover {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.5);
+  transform: translateY(-1px);
+}
+
+.copyBtn:active {
+  transform: scale(0.96) translateY(0);
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--dim);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.btnDanger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #fff;
+  border: none;
+  padding: 12px 32px;
+  border-radius: var(--radius-sm);
+  font-size: 14.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  box-shadow: 
+    0 4px 12px rgba(239, 68, 68, 0.35),
+    0 1px 0px rgba(255, 255, 255, 0.15) inset;
+  width: 100%;
+}
+
+.btnDanger:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 6px 16px rgba(239, 68, 68, 0.45),
+    0 1px 0px rgba(255, 255, 255, 0.25) inset;
+}
+
+.btnDanger:active {
+  transform: scale(0.96) translateY(0);
+}
+
+.playerAvatar {
+  width: 76px;
+  height: 76px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 10px 0;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-  border: 3px solid #fff;
-  animation: bounceAvatar 2s infinite ease-in-out;
+  margin: 8px 0;
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  animation: bounceAvatar 2.5s infinite ease-in-out;
 }
+
 @keyframes bounceAvatar {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  50% { transform: translateY(-8px); }
 }
+
 .playerEmoji {
-  font-size: 38px;
+  font-size: 40px;
 }
